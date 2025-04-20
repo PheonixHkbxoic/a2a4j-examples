@@ -1,0 +1,9 @@
+server:
+  port: 8989
+
+
+a2a4j:
+  notification:
+    endpoint: "/notify"
+    jwksUrls:
+      - http://127.0.0.1:8901/.well-known/jwks.json

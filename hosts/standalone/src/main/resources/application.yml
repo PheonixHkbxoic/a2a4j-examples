@@ -1,0 +1,14 @@
+server:
+  port: 8900
+
+
+a2a4j:
+  host:
+    # can be null
+    notification:
+      url: http://127.0.0.1:8989/notify
+
+    agents:
+      agent-001:
+        baseUrl: http://127.0.0.1:8901
+

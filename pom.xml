@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.pheker.ai</groupId>
+    <artifactId>a2a4j-examples</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>a2a4j-examples</name>
+    <url>http://maven.apache.org</url>
+    <modules>
+        <module>hosts</module>
+        <module>agents</module>
+        <module>notification-listener</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springboot.version>2.7.18</springboot.version>
+        <a2a4j.version>1.0.0</a2a4j.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.pheker.ai</groupId>
+                <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
+                <version>${a2a4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.pheker.ai</groupId>
+                <artifactId>a2a4j-host-spring-boot-starter</artifactId>
+                <version>${a2a4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.pheker.ai</groupId>
+                <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
