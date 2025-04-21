@@ -1,7 +1,7 @@
-package cn.pheker.ai.a2a4j.notification;
+package io.github.PheonixHkbxoic.a2a4j.examples.notification;
 
-import cn.pheker.ai.a2a4j.mvc.WebMvcNotificationAdapter;
-import cn.pheker.ai.a2a4j.notification.autoconfiguration.A2a4jNotificationProperties;
+import io.github.PheonixHkbxoic.a2a4j.mvc.WebMvcNotificationAdapter;
+import io.github.PheonixHkbxoic.a2a4j.notification.autoconfiguration.A2a4jNotificationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,5 +16,5 @@ public class NotificationListener extends WebMvcNotificationAdapter {
     public NotificationListener(@Autowired A2a4jNotificationProperties a2a4jNotificationProperties) {
         super(a2a4jNotificationProperties.getEndpoint(), a2a4jNotificationProperties.getJwksUrls());
     }
-    
+
 }

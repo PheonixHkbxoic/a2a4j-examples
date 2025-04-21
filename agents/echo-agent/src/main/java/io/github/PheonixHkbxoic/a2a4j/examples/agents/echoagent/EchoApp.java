@@ -1,4 +1,4 @@
-package cn.pheker.ai.a2a4j.example.echo;
+package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

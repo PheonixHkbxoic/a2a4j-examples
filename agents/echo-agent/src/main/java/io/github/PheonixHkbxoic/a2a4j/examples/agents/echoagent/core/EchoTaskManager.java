@@ -1,14 +1,14 @@
-package cn.pheker.ai.a2a4j.example.echo.core;
+package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent.core;
 
 
-import cn.pheker.ai.a2a4j.core.core.InMemoryTaskManager;
-import cn.pheker.ai.a2a4j.core.core.PushNotificationSenderAuth;
-import cn.pheker.ai.a2a4j.core.spec.ValueError;
-import cn.pheker.ai.a2a4j.core.spec.entity.*;
-import cn.pheker.ai.a2a4j.core.spec.error.InternalError;
-import cn.pheker.ai.a2a4j.core.spec.error.InvalidParamsError;
-import cn.pheker.ai.a2a4j.core.spec.message.*;
-import cn.pheker.ai.a2a4j.core.util.Util;
+import io.github.PheonixHkbxoic.a2a4j.core.core.InMemoryTaskManager;
+import io.github.PheonixHkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
+import io.github.PheonixHkbxoic.a2a4j.core.spec.ValueError;
+import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.*;
+import io.github.PheonixHkbxoic.a2a4j.core.spec.error.InternalError;
+import io.github.PheonixHkbxoic.a2a4j.core.spec.error.InvalidParamsError;
+import io.github.PheonixHkbxoic.a2a4j.core.spec.message.*;
+import io.github.PheonixHkbxoic.a2a4j.core.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

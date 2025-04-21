@@ -1,4 +1,4 @@
-package cn.pheker.ai.a2a4j.notification;
+package io.github.PheonixHkbxoic.a2a4j.examples.notification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

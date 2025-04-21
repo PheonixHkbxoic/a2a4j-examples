@@ -1,4 +1,4 @@
-package cn.pheker.ai.a2a4j.example.echo.core;
+package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent.core;
 
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
