@@ -47,7 +47,7 @@ public class AgentController {
                 .message(new Message(Role.USER, Collections.singletonList(new TextPart(prompts)), null))
                 .pushNotification(client.getPushNotificationConfig())
                 .build();
-        log.info("params: {}", Util.toJson(params));
+        log.info("chat params: {}", Util.toJson(params));
         SendTaskResponse sendTaskResponse = client.sendTask(params);
 
         JsonRpcError error = sendTaskResponse.getError();
@@ -80,7 +80,7 @@ public class AgentController {
                 .message(new Message(Role.USER, Collections.singletonList(new TextPart(prompts)), null))
                 .pushNotification(client.getPushNotificationConfig())
                 .build();
-        log.info("params: {}", Util.toJson(params));
+        log.info("completed params: {}", Util.toJson(params));
         Flux<SendTaskStreamingResponse> responseFlux = client.sendTaskSubscribe(params);
 
         responseFlux

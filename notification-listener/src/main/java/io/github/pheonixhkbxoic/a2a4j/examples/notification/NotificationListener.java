@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class NotificationListener extends WebMvcNotificationAdapter {
-    protected ScheduledThreadPoolExecutor scheduler;
+    protected final ScheduledThreadPoolExecutor scheduler;
 
     public NotificationListener(@Autowired A2a4jNotificationProperties a2a4jNotificationProperties) {
         super(a2a4jNotificationProperties.getEndpoint(), a2a4jNotificationProperties.getJwksUrls());
