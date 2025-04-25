@@ -1,12 +1,12 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.hosts.standalone.controller;
+package io.github.pheonixhkbxoic.a2a4j.examples.hosts.standalone.controller;
 
-import io.github.PheonixHkbxoic.a2a4j.core.client.A2AClient;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.*;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.error.JsonRpcError;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.message.SendTaskResponse;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
-import io.github.PheonixHkbxoic.a2a4j.core.util.Util;
-import io.github.PheonixHkbxoic.a2a4j.core.util.Uuid;
+import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.error.JsonRpcError;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskResponse;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
+import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
+import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

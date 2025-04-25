@@ -1,14 +1,14 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent.core;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core;
 
 
-import io.github.PheonixHkbxoic.a2a4j.core.core.InMemoryTaskManager;
-import io.github.PheonixHkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.ValueError;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.*;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.error.InternalError;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.error.InvalidParamsError;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.message.*;
-import io.github.PheonixHkbxoic.a2a4j.core.util.Util;
+import io.github.pheonixhkbxoic.a2a4j.core.core.InMemoryTaskManager;
+import io.github.pheonixhkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.ValueError;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.error.InternalError;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.error.InvalidParamsError;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.message.*;
+import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,30 +30,30 @@ import java.util.stream.Collectors;
 @Component
 public class EchoTaskManager extends InMemoryTaskManager {
     // wire agent
-    private final EchoAgent agent;
+    private final io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core.EchoAgent agent;
     // agent support modes
     private final List<String> supportModes = Arrays.asList("text", "file", "data");
 
-    public EchoTaskManager(@Autowired EchoAgent agent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
+    public EchoTaskManager(@Autowired io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core.EchoAgent agent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
         this.agent = agent;
         // must autowired, keep PushNotificationSenderAuth instance unique global
         this.pushNotificationSenderAuth = pushNotificationSenderAuth;
     }
 
     @Override
-    public SendTaskResponse onSendTask(SendTaskRequest request) {
+    public Mono<SendTaskResponse> onSendTask(SendTaskRequest request) {
         log.info("onSendTask request: {}", request);
         TaskSendParams ps = request.getParams();
         // 1. check
         JsonRpcResponse<Object> error = this.validRequest(request);
         if (error != null) {
-            return new SendTaskResponse(request.getId(), error.getError());
+            return Mono.just(new SendTaskResponse(request.getId(), error.getError()));
         }
         // check and set pushNotification
         if (ps.getPushNotification() != null) {
             boolean verified = this.verifyPushNotificationInfo(ps.getId(), ps.getPushNotification());
             if (!verified) {
-                return new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid"));
+                return Mono.just(new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid")));
             }
         }
 
@@ -63,18 +63,18 @@ public class EchoTaskManager extends InMemoryTaskManager {
         this.sendTaskNotification(taskWorking);
 
         // 2. agent invoke
-        List<Artifact> artifacts = this.agentInvoke(ps).block();
+        return this.agentInvoke(ps).map(artifacts -> {
+            // 4. save and notification
+            Task taskCompleted = this.updateStore(ps.getId(), new TaskStatus(TaskState.COMPLETED), artifacts);
+            this.sendTaskNotification(taskCompleted);
 
-        // 4. save and notification
-        Task taskCompleted = this.updateStore(ps.getId(), new TaskStatus(TaskState.COMPLETED), artifacts);
-        this.sendTaskNotification(taskCompleted);
-
-        Task taskSnapshot = this.appendTaskHistory(taskCompleted, 3);
-        return new SendTaskResponse(taskSnapshot);
+            Task taskSnapshot = this.appendTaskHistory(taskCompleted, 3);
+            return new SendTaskResponse(taskSnapshot);
+        });
     }
 
     @Override
-    public Mono<JsonRpcResponse> onSendTaskSubscribe(SendTaskStreamingRequest request) {
+    public Mono<? extends JsonRpcResponse<?>> onSendTaskSubscribe(SendTaskStreamingRequest request) {
         return Mono.fromCallable(() -> {
             log.info("onSendTaskSubscribe request: {}", request);
             TaskSendParams ps = request.getParams();
@@ -160,21 +160,20 @@ public class EchoTaskManager extends InMemoryTaskManager {
 
     private static String getUserQuery(TaskSendParams ps) {
         List<Part> parts = ps.getMessage().getParts();
-        String prompts = parts.stream()
+        return parts.stream()
                 .filter(p -> p instanceof TextPart)
                 .map(p -> ((TextPart) p).getText())
                 .collect(Collectors.joining("\n"));
-        return prompts;
     }
 
     @Override
-    public Mono<JsonRpcResponse> onResubscribeTask(TaskResubscriptionRequest request) {
+    public Mono<JsonRpcResponse<?>> onResubscribeTask(TaskResubscriptionRequest request) {
         TaskIdParams params = request.getParams();
         try {
             this.initEventQueue(params.getId(), true);
         } catch (Exception e) {
             log.error("Error while reconnecting to SSE stream: {}", e.getMessage());
-            return Mono.just(new JsonRpcResponse(request.getId(), new InternalError("An error occurred while reconnecting to stream: " + e.getMessage())));
+            return Mono.just(new JsonRpcResponse<>(request.getId(), new InternalError("An error occurred while reconnecting to stream: " + e.getMessage())));
         }
 
         return Mono.empty();

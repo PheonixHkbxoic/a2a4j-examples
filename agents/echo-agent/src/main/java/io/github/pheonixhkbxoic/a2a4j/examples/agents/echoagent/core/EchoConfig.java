@@ -1,9 +1,9 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent.core;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core;
 
 
-import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.AgentCapabilities;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.AgentCard;
-import io.github.PheonixHkbxoic.a2a4j.core.spec.entity.AgentSkill;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentCapabilities;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentCard;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentSkill;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

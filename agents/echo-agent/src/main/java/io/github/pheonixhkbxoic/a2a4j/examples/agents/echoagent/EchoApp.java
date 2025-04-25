@@ -1,4 +1,4 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

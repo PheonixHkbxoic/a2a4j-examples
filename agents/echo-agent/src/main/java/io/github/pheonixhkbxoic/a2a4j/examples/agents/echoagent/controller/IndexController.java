@@ -1,4 +1,4 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.agents.echoagent.controller;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

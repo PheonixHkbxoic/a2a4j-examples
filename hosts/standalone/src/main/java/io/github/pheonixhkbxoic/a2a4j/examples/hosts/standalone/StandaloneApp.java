@@ -1,4 +1,4 @@
-package io.github.PheonixHkbxoic.a2a4j.examples.notification;
+package io.github.pheonixhkbxoic.a2a4j.examples.hosts.standalone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @desc
  */
 @SpringBootApplication
-public class NotificationListenerApp {
+public class StandaloneApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(NotificationListenerApp.class, args);
+        SpringApplication.run(StandaloneApp.class, args);
     }
 
 
