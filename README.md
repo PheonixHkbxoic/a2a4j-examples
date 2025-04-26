@@ -53,17 +53,19 @@ Features:
 
 ```xml
 
-<dependency>
-    <groupId>io.github.pheonixhkbxoic</groupId>
-    <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
-</dependency>
-        <!-- 或 use webflux -->
-<dependency>
-<groupId>io.github.pheonixhkbxoic</groupId>
-<artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>
-<version>1.0.1</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>io.github.pheonixhkbxoic</groupId>
+        <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+    <!-- 或 use webflux -->
+    <!--    <dependency>-->
+    <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
+    <!--        <artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>-->
+    <!--        <version>1.0.1</version>-->
+    <!--    </dependency>-->
+</dependencies>
 ```
 
 2. 配置AgentCard实例
@@ -251,17 +253,20 @@ public class AgentController {
 
 ```xml
 
-<dependency>
-    <groupId>io.github.pheonixhkbxoic</groupId>
-    <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
-</dependency>
-        <!-- 或 use webflux -->
-<dependency>
-<groupId>io.github.pheonixhkbxoic</groupId>
-<artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>
-<version>1.0.1</version>
-</dependency>
+<dependencies>
+
+    <dependency>
+        <groupId>io.github.pheonixhkbxoic</groupId>
+        <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+    <!-- 或 use webflux -->
+    <!--    <dependency>-->
+    <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
+    <!--        <artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>-->
+    <!--        <version>1.0.1</version>-->
+    <!--    </dependency>-->
+</dependencies>
 ```
 
 2. 在配置文件(如application.xml)中配置相关属性
