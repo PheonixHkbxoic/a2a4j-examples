@@ -57,13 +57,13 @@ Features:
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
-        <version>1.0.1</version>
+        <version>2.0.0</version>
     </dependency>
     <!-- 或 use webflux -->
     <!--    <dependency>-->
     <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
     <!--        <artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>-->
-    <!--        <version>1.0.1</version>-->
+    <!--        <version>2.0.0</version>-->
     <!--    </dependency>-->
 </dependencies>
 ```
@@ -181,7 +181,7 @@ public class EchoTaskManager extends InMemoryTaskManager {
 <dependency>
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-host-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -258,13 +258,13 @@ public class AgentController {
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-        <version>1.0.1</version>
+        <version>2.0.0</version>
     </dependency>
     <!-- 或 use webflux -->
     <!--    <dependency>-->
     <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
     <!--        <artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>-->
-    <!--        <version>1.0.1</version>-->
+    <!--        <version>2.0.0</version>-->
     <!--    </dependency>-->
 </dependencies>
 ```

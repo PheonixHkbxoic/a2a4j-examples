@@ -7,3 +7,4 @@ a2a4j:
     endpoint: "/notify"
     jwksUrls:
       - http://127.0.0.1:8901/.well-known/jwks.json
+      - http://127.0.0.1:8902/.well-known/jwks.json

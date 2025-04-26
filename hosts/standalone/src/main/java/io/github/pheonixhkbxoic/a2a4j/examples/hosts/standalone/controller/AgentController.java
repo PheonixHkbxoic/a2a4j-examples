@@ -7,6 +7,7 @@ import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

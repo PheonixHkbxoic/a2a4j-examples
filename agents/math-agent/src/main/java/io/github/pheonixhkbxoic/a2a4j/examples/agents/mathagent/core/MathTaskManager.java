@@ -1,4 +1,4 @@
-package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.core;
 
 
 import io.github.pheonixhkbxoic.a2a4j.core.core.InMemoryTaskManager;
@@ -12,7 +12,6 @@ import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -28,14 +27,14 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class EchoTaskManager extends InMemoryTaskManager {
+public class MathTaskManager extends InMemoryTaskManager {
     // wire agent
-    private final EchoAgent agent;
+    private final MathAgent mathAgent;
     // agent support modes
     private final List<String> supportModes = Arrays.asList("text", "file", "data");
 
-    public EchoTaskManager(@Autowired io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core.EchoAgent agent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
-        this.agent = agent;
+    public MathTaskManager(@Autowired MathAgent mathAgent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
+        this.mathAgent = mathAgent;
         // must autowired, keep PushNotificationSenderAuth instance unique global
         this.pushNotificationSenderAuth = pushNotificationSenderAuth;
     }
@@ -118,42 +117,42 @@ public class EchoTaskManager extends InMemoryTaskManager {
         String sessionId = params.getSessionId();
         String prompts = getUserQuery(params);
 
-        // TODO simulate agent token stream and enqueue
         // keep multi turn conversation with sessionId
-        Flux.range(1, 10)
-                .subscribeOn(Schedulers.newSingle("echo-thread"))
-                .subscribe(i -> {
-                    List<Part> parts = Collections.singletonList(new TextPart("sse message: " + i));
-                    TaskState state;
-                    Message message = null;
-                    Artifact artifact = null;
-                    boolean finalFlag = false;
-                    if (i == 10) {
-                        state = TaskState.COMPLETED;
-                        finalFlag = true;
-                        artifact = new Artifact(parts, 0, false);
-//                    } else if (i == 5) {
-//                        state = TaskState.INPUT_REQUIRED;
-//                        message = new Message(Role.AGENT, parts, null);
-//                        finalFlag = true;
-                    } else {
-                        state = TaskState.WORKING;
-                        message = new Message(Role.AGENT, parts, null);
-                    }
-
-                    TaskStatus taskStatus = new TaskStatus(state, message);
-                    Task latestTask = this.updateStore(taskId, taskStatus, Collections.singletonList(artifact));
+        mathAgent.chatStream(prompts)
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnComplete(() -> {
+                    List<Part> parts = Collections.singletonList(new TextPart(""));
+                    Message message = new Message(Role.AGENT, parts, null);
+                    TaskStatus taskStatus = new TaskStatus(TaskState.COMPLETED, message);
+                    Task latestTask = this.updateStore(taskId, taskStatus, Collections.singletonList(null));
                     // send notification
                     this.sendTaskNotification(latestTask);
 
-                    // artifact event
-                    if (artifact != null) {
-                        TaskArtifactUpdateEvent taskArtifactUpdateEvent = new TaskArtifactUpdateEvent(taskId, artifact);
-                        this.enqueueEvent(taskId, taskArtifactUpdateEvent);
-                    }
+                    // end stream
+                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, true);
+                    this.enqueueEvent(taskId, taskStatusUpdateEvent);
+                })
+                .doOnError(e -> {
+                    // end stream
+                    List<Part> parts = Collections.singletonList(new TextPart(e.getMessage()));
+                    Message message = new Message(Role.AGENT, parts, null);
+                    TaskStatus taskStatus = new TaskStatus(TaskState.FAILED, message);
+
+                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, true);
+                    this.enqueueEvent(taskId, taskStatusUpdateEvent);
+                })
+                .subscribe(text -> {
+                    List<Part> parts = Collections.singletonList(new TextPart(text));
+                    TaskState state = TaskState.WORKING;
+                    Message message = new Message(Role.AGENT, parts, null);
+
+                    TaskStatus taskStatus = new TaskStatus(state, message);
+                    Task latestTask = this.updateStore(taskId, taskStatus, Collections.singletonList(null));
+                    // send notification
+                    this.sendTaskNotification(latestTask);
 
                     // status event
-                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, finalFlag);
+                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, false);
                     this.enqueueEvent(taskId, taskStatusUpdateEvent);
                 });
     }
@@ -187,10 +186,10 @@ public class EchoTaskManager extends InMemoryTaskManager {
                 .map(p -> ((TextPart) p).getText())
                 .collect(Collectors.joining("\n"));
 
-        return this.agent.chat(prompts).map(answer -> {
+        return this.mathAgent.chat(prompts).map(answer -> {
             Artifact artifact = Artifact.builder()
-                    .name("echo")
-                    .description("echo request")
+                    .name("math_answer")
+                    .description("answer of math question")
                     .append(false)
                     .parts(Collections.singletonList(new TextPart(answer)))
                     .build();

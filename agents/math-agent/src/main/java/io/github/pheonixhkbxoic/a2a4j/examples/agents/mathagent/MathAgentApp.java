@@ -1,4 +1,4 @@
-package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @desc
  */
 @SpringBootApplication
-public class EchoApp {
+public class MathAgentApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(EchoApp.class, args);
+        SpringApplication.run(MathAgentApp.class, args);
     }
 
 

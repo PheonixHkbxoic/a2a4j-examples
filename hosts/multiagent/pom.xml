@@ -7,12 +7,11 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>standalone</artifactId>
+    <artifactId>multiagent</artifactId>
     <packaging>jar</packaging>
 
-    <name>standalone</name>
-    <description>a2a4j host example: standalone</description>
-    <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
+    <name>multiagent</name>
+    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,5 +22,17 @@
             <groupId>io.github.pheonixhkbxoic</groupId>
             <artifactId>a2a4j-host-spring-boot-starter</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
     </dependencies>
+
+
 </project>

@@ -1,4 +1,4 @@
-package io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core;
+package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.core;
 
 
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentCapabilities;
@@ -17,7 +17,7 @@ import java.util.List;
  * @desc
  */
 @Configuration
-public class EchoConfig {
+public class MathConfig {
     @Value("${server.port}")
     private Integer port;
 
@@ -25,17 +25,17 @@ public class EchoConfig {
     public AgentCard agentCard() {
         AgentCapabilities capabilities = new AgentCapabilities();
         AgentSkill skill = AgentSkill.builder()
-                .id("echoAgent")
-                .name("echo agent")
-                .description("just echo user message")
-                .tags(List.of("echo"))
-                .examples(Collections.singletonList("I'm big strong!"))
+                .id("mathAgent")
+                .name("math agent")
+                .description("math genius, math expert, good at resolving all math questions")
+                .tags(List.of("math genius", "math expert", "calculator"))
+                .examples(Collections.singletonList("calculate square root of 13, keep 8 precision"))
                 .inputModes(Collections.singletonList("text"))
                 .outputModes(Collections.singletonList("text"))
                 .build();
         AgentCard agentCard = new AgentCard();
-        agentCard.setName("echoAgent");
-        agentCard.setDescription("echo agent, Answer the user's questions exactly as they are");
+        agentCard.setName("mathAgent");
+        agentCard.setDescription("math genius, math expert, good at resolving all math questions");
         agentCard.setUrl("http://127.0.0.1:" + port);
         agentCard.setVersion("2.0.0");
         agentCard.setCapabilities(capabilities);
