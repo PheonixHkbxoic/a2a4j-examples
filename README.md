@@ -32,12 +32,22 @@ A2A 协议有三个参与者：
 
 ### 前置条件
 
-* a2a4j目录使用JDK8、SpringBoot 2.7.18进行开发
-* 目前支持SpringMvc+Reactor+SSE
-* 后续会支持servlet,webflux
-* 后续会支持JDK17+, SpringBoot 3.X
+Branches:
 
-### server配置
+* jdk8 examples of jdk8, SpringBoot 2.7.18
+* main examples of jdk17, SpringBoot 3.4.5
+
+Features:
+
+- [x] support spring mvc, reactor, sse
+- [x] support servlet and sse
+- [x] support webflux and sse
+- [x] more a2a4j example project, please refer
+  to [a2a4j-examples jdk8](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/jdk8)
+  and [a2a4j-examples main](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main)
+- [ ] support more LLM, eg.LangChain
+
+### agent/server配置
 
 1. 引入maven依赖
 
@@ -46,7 +56,13 @@ A2A 协议有三个参与者：
 <dependency>
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
+</dependency>
+        <!-- 或 use webflux -->
+<dependency>
+<groupId>io.github.pheonixhkbxoic</groupId>
+<artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>
+<version>1.0.1</version>
 </dependency>
 ```
 
@@ -62,7 +78,7 @@ public AgentCard agentCard() {
     agentCard.setName("Currency Agent");
     agentCard.setDescription("current exchange");
     agentCard.setUrl("http://127.0.0.1:" + port);
-    agentCard.setVersion("1.0.0");
+    agentCard.setVersion("1.0.1");
     agentCard.setCapabilities(capabilities);
     agentCard.setSkills(Collections.singletonList(skill));
     return agentCard;
@@ -154,7 +170,7 @@ public class EchoTaskManager extends InMemoryTaskManager {
 4. 代码参考
    [a2a4j-examples agents/echo-agent](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/agents/echo-agent)
 
-### client/host配置
+### host/client配置
 
 1. 引入maven依赖
 
@@ -163,7 +179,7 @@ public class EchoTaskManager extends InMemoryTaskManager {
 <dependency>
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-host-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -238,7 +254,13 @@ public class AgentController {
 <dependency>
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
+</dependency>
+        <!-- 或 use webflux -->
+<dependency>
+<groupId>io.github.pheonixhkbxoic</groupId>
+<artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>
+<version>1.0.1</version>
 </dependency>
 ```
 
@@ -263,11 +285,19 @@ a2a4j:
 
 @Component
 public class NotificationListener extends WebMvcNotificationAdapter {
+    protected final ScheduledThreadPoolExecutor scheduler;
 
     public NotificationListener(@Autowired A2a4jNotificationProperties a2a4jNotificationProperties) {
         super(a2a4jNotificationProperties.getEndpoint(), a2a4jNotificationProperties.getJwksUrls());
-    }
 
+        // auto reloadJwks when Agent restart
+        scheduler = new ScheduledThreadPoolExecutor(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            if (verifyFailCount.get() != 0) {
+                this.reloadJwks();
+            }
+        }, 1, 1, TimeUnit.MINUTES);
+    }
     // TODO 实现方法来处理通知，可以使用默认实现
 }
 

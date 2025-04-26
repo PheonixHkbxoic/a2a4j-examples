@@ -4,7 +4,7 @@
 
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-examples</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <name>a2a4j-examples</name>
@@ -20,7 +20,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springboot.version>2.7.18</springboot.version>
-        <a2a4j.version>1.0.0</a2a4j.version>
+        <a2a4j.version>1.0.1</a2a4j.version>
     </properties>
 
     <dependencyManagement>
@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>io.github.pheonixhkbxoic</groupId>
                 <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
