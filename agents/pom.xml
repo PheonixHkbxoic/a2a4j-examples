@@ -17,6 +17,7 @@
     <modules>
         <module>echo-agent</module>
         <module>math-agent</module>
+        <module>rag-agent</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

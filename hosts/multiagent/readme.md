@@ -37,7 +37,36 @@ answer:
 
 - data:3.60555128
 
+## found agent: ragAgent
 
+question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=what%20is%20miles  
+answer:  
+At **Miles of Smiles Car Rental Services**, "Miles" refers to:
 
+1. **Our Company Name**: "Miles of Smiles" is our brand identity as a car rental service provider.
 
+2. **Mileage Policy**: While our standard rental agreements include unlimited mileage for most vehicles, some specialty
+   or premium rentals may have mileage restrictions. Any applicable mileage limits or fees would be clearly stated in
+   your rental agreement.
 
+3. **Vehicle Usage**: The term also reflects our commitment to helping you travel ("miles") with happiness ("smiles").
+
+Would you like me to check:
+
+- The mileage policy for a specific vehicle class?
+- Your current rental's mileage terms?
+- Or assist with any other car rental service?
+
+I'm happy to provide details relevant to your rental needs!
+
+question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=what%20is%20miles  
+answer(stream):  
+At **Miles of Smiles Car Rental Services**, "Miles" refers to our company name and brand. We are a car rental
+service
+that provides vehicles to customers for their transportation needs. If you're asking about **mileage policies**:  - Our
+rental vehicles come with standard mileage allowances, which vary by rental package. - Any additional mileage fees (if
+applicable) would be outlined in your rental agreement. Would you like specific details about mileage limits for a
+particular rental? I’d be happy to check for you—just share your **booking number** or desired rental dates!  For other
+questions about bookings, cancellations, or vehicle use, feel free to ask. 😊
+
+note: the answer maybe different for every time
