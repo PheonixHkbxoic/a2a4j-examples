@@ -9,6 +9,8 @@ import dev.langchain4j.model.chat.request.ResponseFormat;
 import dev.langchain4j.model.chat.request.ResponseFormatType;
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.model.chat.request.json.JsonSchema;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import dev.langchain4j.model.input.PromptTemplate;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
@@ -20,6 +22,7 @@ import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
 import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.schema.ExecuteContext;
 import io.github.pheonixhkbxoic.a2a4j.host.autoconfiguration.A2a4jAgentsProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -59,6 +62,8 @@ public class AgentRouter {
                 .messages(systemMessage, UserMessage.from(query))
                 .build();
         return Mono.fromSupplier(() -> {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start("router");
             String text = model.chat(request).aiMessage().text();
             log.info("chat response text: {}", text);
             text = text.replaceFirst("^```json|```$", "");
@@ -66,13 +71,19 @@ public class AgentRouter {
             // return the answer directly
             String activeAgent = ec.getResult().getActiveAgent();
             Optional<A2AClient> targetClient = agentClients.stream().filter(c -> c.getAgentCard().getName().equals(activeAgent)).findFirst();
-
+            stopWatch.stop();
             if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || targetClient.isEmpty()) {
+                log.info("chat statistics: {}", stopWatch.prettyPrint());
                 return ec.getResult().getAnswer();
             }
 
             // route suitable agent
-            return routeToAgent(targetClient.get(), sessionId, query);
+            stopWatch.start("router agent");
+            String result = routeToAgent(targetClient.get(), sessionId, query);
+            stopWatch.stop();
+
+            log.info("chat statistics: {}", stopWatch.prettyPrint());
+            return result;
         });
     }
 
@@ -82,22 +93,40 @@ public class AgentRouter {
                 .messages(systemMessage, UserMessage.from(query))
                 .build();
         return Flux.create(sink -> {
-            String text = model.chat(request).aiMessage().text();
-            log.info("chatStream response text: {}", text);
-            text = text.replaceFirst("^```json|```$", "");
-            ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
-            // return the answer directly
-            String activeAgent = ec.getResult().getActiveAgent();
-            Optional<A2AClient> targetClient = agentClients.stream().filter(c -> c.getAgentCard().getName().equals(activeAgent)).findFirst();
-            if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || targetClient.isEmpty()) {
-                String answer = ec.getResult().getAnswer();
-                sink.next(answer);
-                sink.complete();
-            } else {
-                // route suitable agent
-                A2AClient agentClient = targetClient.get();
-                routerToAgentStream(agentClient, sessionId, query, sink);
-            }
+            StringBuilder cache = new StringBuilder();
+            streamingModel.chat(request, new StreamingChatResponseHandler() {
+                @Override
+                public void onPartialResponse(String s) {
+                    cache.append(s);
+                }
+
+                @Override
+                public void onCompleteResponse(ChatResponse chatResponse) {
+                    String text = cache.toString();
+                    log.info("chatStream response text: {}", text);
+                    text = text.replaceFirst("^```json|```$", "");
+                    ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
+                    // return the answer directly
+                    String activeAgent = ec.getResult().getActiveAgent();
+                    Optional<A2AClient> targetClient = agentClients.stream()
+                            .filter(c -> c.getAgentCard().getName().equals(activeAgent))
+                            .findFirst();
+                    if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || targetClient.isEmpty()) {
+                        String answer = ec.getResult().getAnswer();
+                        sink.next(answer);
+                        sink.complete();
+                    } else {
+                        // route suitable agent
+                        A2AClient agentClient = targetClient.get();
+                        routerToAgentStream(agentClient, sessionId, query, sink);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    sink.error(throwable);
+                }
+            });
         });
     }
 

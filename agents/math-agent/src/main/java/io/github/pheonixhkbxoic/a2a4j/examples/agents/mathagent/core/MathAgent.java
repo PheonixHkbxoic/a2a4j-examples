@@ -9,6 +9,7 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.tool.Calculator;
 import jakarta.annotation.Resource;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,6 +40,7 @@ public class MathAgent {
     private final Calculator calculator = new Calculator();
 
     private final SystemMessage systemMessage = new SystemMessage("You are a math genius, good at resolving all math questions");
+    // manually handle tool execution
     private final Map<String, Function<String, String>> toolHandlerMappings = Map.of(
             "squareRoot", args -> {
                 Map params = Util.fromJson(args, HashMap.class);
@@ -52,7 +56,7 @@ public class MathAgent {
             }
     );
 
-    Mono<String> chat(String prompt) {
+    Mono<String> chat(String sessionId, String prompt) {
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(prompt))
                 .toolSpecifications(ToolSpecifications.toolSpecificationsFrom(Calculator.class))
@@ -78,12 +82,15 @@ public class MathAgent {
     private String invokeTools(AiMessage aiMessage) {
         return aiMessage.toolExecutionRequests().stream()
                 .map(r -> {
-                    Function<String, String> handler = toolHandlerMappings.get(r.name());
-                    if (handler == null) {
-                        return "";
-                    }
+//                    Function<String, String> handler = toolHandlerMappings.get(r.name());
+//                    if (handler == null) {
+//                        return "";
+//                    }
+//                    return handler.apply(r.arguments());
                     try {
-                        return handler.apply(r.arguments());
+                        Map<String, Object> params = Util.fromJson(r.arguments(), HashMap.class);
+                        Object result = ToolUtil.invoke(calculator, r.name(), params);
+                        return result == null ? "" : result.toString();
                     } catch (Exception e) {
                         log.error("tool execute exception, name: {}, arguments: {}, error: {}",
                                 r.name(), r.arguments(), e.getMessage(), e);
@@ -93,21 +100,33 @@ public class MathAgent {
                 .collect(Collectors.joining("\n"));
     }
 
-    // TODO streamModel return "" if use toolSpecifications
-    public Flux<String> chatStream(String prompt) {
+    public Flux<TaskStatus> chatStream(String sessionId, String prompt) {
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(prompt))
                 .toolSpecifications(ToolSpecifications.toolSpecificationsFrom(Calculator.class))
                 .build();
+        MathAgent that = this;
 
         return Flux.create(sink -> streamingModel.chat(request, new StreamingChatResponseHandler() {
             @Override
-            public void onPartialResponse(String s) {
-                sink.next(s);
+            public void onPartialResponse(String text) {
+                List<Part> parts = Collections.singletonList(new TextPart(text));
+                Message message = new Message(Role.AGENT, parts, null);
+                TaskStatus taskStatus = new TaskStatus(TaskState.WORKING, message);
+                sink.next(taskStatus);
             }
 
             @Override
             public void onCompleteResponse(ChatResponse chatResponse) {
+                AiMessage aiMessage = chatResponse.aiMessage();
+                if (aiMessage.hasToolExecutionRequests()) {
+                    String result = that.invokeTools(aiMessage);
+                    log.info("question: {}, tool result: {}", prompt, result);
+                    List<Part> parts = Collections.singletonList(new TextPart(result));
+                    Message message = new Message(Role.AGENT, parts, null);
+                    TaskStatus taskStatus = new TaskStatus(TaskState.COMPLETED, message);
+                    sink.next(taskStatus);
+                }
                 sink.complete();
             }
 

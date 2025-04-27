@@ -118,20 +118,8 @@ public class MathTaskManager extends InMemoryTaskManager {
         String prompts = getUserQuery(params);
 
         // keep multi turn conversation with sessionId
-        mathAgent.chatStream(prompts)
+        mathAgent.chatStream(sessionId, prompts)
                 .subscribeOn(Schedulers.boundedElastic())
-                .doOnComplete(() -> {
-                    List<Part> parts = Collections.singletonList(new TextPart(""));
-                    Message message = new Message(Role.AGENT, parts, null);
-                    TaskStatus taskStatus = new TaskStatus(TaskState.COMPLETED, message);
-                    Task latestTask = this.updateStore(taskId, taskStatus, Collections.singletonList(null));
-                    // send notification
-                    this.sendTaskNotification(latestTask);
-
-                    // end stream
-                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, true);
-                    this.enqueueEvent(taskId, taskStatusUpdateEvent);
-                })
                 .doOnError(e -> {
                     // end stream
                     List<Part> parts = Collections.singletonList(new TextPart(e.getMessage()));
@@ -141,18 +129,14 @@ public class MathTaskManager extends InMemoryTaskManager {
                     TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, true);
                     this.enqueueEvent(taskId, taskStatusUpdateEvent);
                 })
-                .subscribe(text -> {
-                    List<Part> parts = Collections.singletonList(new TextPart(text));
-                    TaskState state = TaskState.WORKING;
-                    Message message = new Message(Role.AGENT, parts, null);
-
-                    TaskStatus taskStatus = new TaskStatus(state, message);
+                .subscribe(taskStatus -> {
                     Task latestTask = this.updateStore(taskId, taskStatus, Collections.singletonList(null));
                     // send notification
                     this.sendTaskNotification(latestTask);
 
-                    // status event
-                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, false);
+                    // end sse stream
+                    boolean finalFlag = !TaskState.WORKING.equals(taskStatus.getState());
+                    TaskStatusUpdateEvent taskStatusUpdateEvent = new TaskStatusUpdateEvent(taskId, taskStatus, finalFlag);
                     this.enqueueEvent(taskId, taskStatusUpdateEvent);
                 });
     }
@@ -186,7 +170,7 @@ public class MathTaskManager extends InMemoryTaskManager {
                 .map(p -> ((TextPart) p).getText())
                 .collect(Collectors.joining("\n"));
 
-        return this.mathAgent.chat(prompts).map(answer -> {
+        return this.mathAgent.chat(ps.getSessionId(), prompts).map(answer -> {
             Artifact artifact = Artifact.builder()
                     .name("math_answer")
                     .description("answer of math question")
