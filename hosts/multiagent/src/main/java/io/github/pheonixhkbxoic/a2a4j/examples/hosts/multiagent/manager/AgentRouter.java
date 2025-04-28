@@ -13,9 +13,9 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import dev.langchain4j.model.input.PromptTemplate;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
+import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.JsonRpcError;
-import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
@@ -31,7 +31,6 @@ import reactor.core.scheduler.Schedulers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,15 +40,15 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class AgentRouter {
-    private final List<A2AClient> agentClients;
+    private final A2AClientSet clientSet;
     private final A2a4jAgentsProperties a2a4jAgentsProperties;
 
     private final ChatLanguageModel model;
     private final StreamingChatLanguageModel streamingModel;
 
-    public AgentRouter(List<A2AClient> agentClients, A2a4jAgentsProperties a2a4jAgentsProperties,
+    public AgentRouter(A2AClientSet a2aClientSet, A2a4jAgentsProperties a2a4jAgentsProperties,
                        ChatLanguageModel model, StreamingChatLanguageModel streamingModel) {
-        this.agentClients = agentClients;
+        this.clientSet = a2aClientSet;
         this.a2a4jAgentsProperties = a2a4jAgentsProperties;
         this.model = model;
         this.streamingModel = streamingModel;
@@ -70,16 +69,16 @@ public class AgentRouter {
             ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
             // return the answer directly
             String activeAgent = ec.getResult().getActiveAgent();
-            Optional<A2AClient> targetClient = agentClients.stream().filter(c -> c.getAgentCard().getName().equals(activeAgent)).findFirst();
+            A2AClient agentClient = clientSet.getByName(activeAgent);
             stopWatch.stop();
-            if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || targetClient.isEmpty()) {
+            if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || agentClient == null) {
                 log.info("chat statistics: {}", stopWatch.prettyPrint());
                 return ec.getResult().getAnswer();
             }
 
             // route suitable agent
             stopWatch.start("router agent");
-            String result = routeToAgent(targetClient.get(), sessionId, query);
+            String result = routeToAgent(agentClient, sessionId, query).block();
             stopWatch.stop();
 
             log.info("chat statistics: {}", stopWatch.prettyPrint());
@@ -108,16 +107,13 @@ public class AgentRouter {
                     ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
                     // return the answer directly
                     String activeAgent = ec.getResult().getActiveAgent();
-                    Optional<A2AClient> targetClient = agentClients.stream()
-                            .filter(c -> c.getAgentCard().getName().equals(activeAgent))
-                            .findFirst();
-                    if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || targetClient.isEmpty()) {
+                    A2AClient agentClient = clientSet.getByName(activeAgent);
+                    if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || agentClient == null) {
                         String answer = ec.getResult().getAnswer();
                         sink.next(answer);
                         sink.complete();
                     } else {
                         // route suitable agent
-                        A2AClient agentClient = targetClient.get();
                         routerToAgentStream(agentClient, sessionId, query, sink);
                     }
                 }
@@ -130,23 +126,26 @@ public class AgentRouter {
         });
     }
 
-    private String routeToAgent(A2AClient agentClient, String sessionId, String query) {
+    private Mono<String> routeToAgent(A2AClient agentClient, String sessionId, String query) {
         TaskSendParams taskSendParams = TaskSendParams.builder()
                 .id(Uuid.uuid4hex())
                 .sessionId(sessionId)
                 .message(Message.builder().parts(List.of(new TextPart(query))).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
-        SendTaskResponse sendTaskResponse = agentClient.sendTask(taskSendParams);
-        JsonRpcError error = sendTaskResponse.getError();
-        if (error != null) {
-            throw new RuntimeException(error.getMessage());
-        }
-        return sendTaskResponse.getResult().getArtifacts().stream()
-                .flatMap(a -> a.getParts().stream())
-                .filter(p -> p.getType().equals(new TextPart().getType()))
-                .map(p -> ((TextPart) p).getText())
-                .collect(Collectors.joining());
+        return agentClient.sendTask(taskSendParams)
+                .map(sendTaskResponse -> {
+                    JsonRpcError error = sendTaskResponse.getError();
+                    if (error != null) {
+                        throw new RuntimeException(error.getMessage());
+                    }
+                    return sendTaskResponse.getResult().getArtifacts().stream()
+                            .flatMap(a -> a.getParts().stream())
+                            .filter(p -> p.getType().equals(new TextPart().getType()))
+                            .map(p -> ((TextPart) p).getText())
+                            .collect(Collectors.joining());
+                });
+
     }
 
     private void routerToAgentStream(A2AClient agentClient, String sessionId, String query, FluxSink<String> sink) {
@@ -213,10 +212,10 @@ public class AgentRouter {
     }
 
     protected String listRemoteAgents() {
-        if (agentClients == null || agentClients.isEmpty()) {
+        if (clientSet.isEmpty()) {
             return "";
         }
-        List<Map<String, String>> agents = agentClients.stream()
+        List<Map<String, String>> agents = clientSet.toNameMap().values().stream()
                 .map(client -> Map.of("name", client.getAgentCard().getName(), "description", client.getAgentCard().getDescription()))
                 .toList();
         return Util.toJson(agents);

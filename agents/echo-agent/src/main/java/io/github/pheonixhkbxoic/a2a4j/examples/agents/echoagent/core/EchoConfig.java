@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2025/4/18 19:40
  * @desc
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class EchoConfig {
     @Value("${server.port}")
     private Integer port;
@@ -42,6 +42,5 @@ public class EchoConfig {
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;
     }
-
-
+    
 }

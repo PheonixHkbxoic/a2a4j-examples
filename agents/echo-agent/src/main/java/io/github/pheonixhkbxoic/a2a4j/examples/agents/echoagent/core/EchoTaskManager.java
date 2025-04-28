@@ -34,7 +34,7 @@ public class EchoTaskManager extends InMemoryTaskManager {
     // agent support modes
     private final List<String> supportModes = Arrays.asList("text", "file", "data");
 
-    public EchoTaskManager(@Autowired io.github.pheonixhkbxoic.a2a4j.examples.agents.echoagent.core.EchoAgent agent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
+    public EchoTaskManager(@Autowired EchoAgent agent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
         this.agent = agent;
         // must autowired, keep PushNotificationSenderAuth instance unique global
         this.pushNotificationSenderAuth = pushNotificationSenderAuth;

@@ -45,7 +45,7 @@
                 <version>${a2a4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.PheonixHkbxoic</groupId>
+                <groupId>io.github.pheonixhkbxoic</groupId>
                 <artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>
                 <version>${a2a4j.version}</version>
             </dependency>

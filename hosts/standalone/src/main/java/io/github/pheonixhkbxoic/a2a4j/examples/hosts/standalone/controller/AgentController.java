@@ -1,9 +1,8 @@
 package io.github.pheonixhkbxoic.a2a4j.examples.hosts.standalone.controller;
 
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
+import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
-import io.github.pheonixhkbxoic.a2a4j.core.spec.error.JsonRpcError;
-import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -33,12 +31,12 @@ import java.util.stream.Collectors;
 @RestController
 public class AgentController {
     @Resource
-    private List<A2AClient> clients;
+    private A2AClientSet clientSet;
 
 
     @GetMapping("/chat")
     public ResponseEntity<Object> chat(String userId, String sessionId, String prompts) {
-        A2AClient client = clients.get(0);
+        A2AClient client = clientSet.getByConfigKey("echoAgent");
         TaskSendParams params = TaskSendParams.builder()
                 .id(Uuid.uuid4hex())
                 .sessionId(sessionId)
@@ -48,19 +46,22 @@ public class AgentController {
                 .pushNotification(client.getPushNotificationConfig())
                 .build();
         log.info("chat params: {}", Util.toJson(params));
-        SendTaskResponse sendTaskResponse = client.sendTask(params);
-
-        JsonRpcError error = sendTaskResponse.getError();
-        if (error != null) {
-            return ResponseEntity.badRequest().body(error);
+        try {
+            String answer = client.sendTask(params)
+                    .map(sendTaskResponse -> {
+                        Task task = sendTaskResponse.getResult();
+                        return task.getArtifacts().stream()
+                                .flatMap(t -> t.getParts().stream())
+                                .filter(p -> new TextPart().getType().equals(p.getType()))
+                                .map(p -> ((TextPart) p).getText())
+                                .collect(Collectors.joining("\n"));
+                    })
+                    .block();
+            return ResponseEntity.ok(answer);
+        } catch (Exception e) {
+            log.error("chat exception: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
-        Task task = sendTaskResponse.getResult();
-        String answer = task.getArtifacts().stream()
-                .flatMap(t -> t.getParts().stream())
-                .filter(p -> new TextPart().getType().equals(p.getType()))
-                .map(p -> ((TextPart) p).getText())
-                .collect(Collectors.joining("\n"));
-        return ResponseEntity.ok(answer);
     }
 
     @GetMapping(value = "/completed", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -71,7 +72,7 @@ public class AgentController {
         sseEmitter.onError(e -> log.error("user sse error: {}", e.getMessage(), e));
         sseEmitter.onCompletion(() -> log.info("user qa completed: {}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
 
-        A2AClient client = clients.get(0);
+        A2AClient client = clientSet.getByConfigKey("echoAgent");
         TaskSendParams params = TaskSendParams.builder()
                 .id(Uuid.uuid4hex())
                 .sessionId(sessionId)
