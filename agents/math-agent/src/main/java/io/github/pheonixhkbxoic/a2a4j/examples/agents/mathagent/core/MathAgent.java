@@ -12,9 +12,7 @@ import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.tool.Calculator;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,15 +29,18 @@ import java.util.stream.Collectors;
  * @desc math agent: use LangChain4j low level  api
  */
 @Slf4j
-@Component
 public class MathAgent {
-    @Resource
     private ChatLanguageModel model;
-    @Resource
     private StreamingChatLanguageModel streamingModel;
     private final Calculator calculator = new Calculator();
 
     private final SystemMessage systemMessage = new SystemMessage("You are a math genius, good at resolving all math questions");
+
+    public MathAgent(ChatLanguageModel model, StreamingChatLanguageModel streamingModel) {
+        this.model = model;
+        this.streamingModel = streamingModel;
+    }
+
     // manually handle tool execution
     private final Map<String, Function<String, String>> toolHandlerMappings = Map.of(
             "squareRoot", args -> {

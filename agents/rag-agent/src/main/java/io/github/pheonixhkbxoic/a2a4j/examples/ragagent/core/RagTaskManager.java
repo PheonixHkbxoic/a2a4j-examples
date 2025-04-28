@@ -4,6 +4,7 @@ package io.github.pheonixhkbxoic.a2a4j.examples.ragagent.core;
 import dev.langchain4j.service.Result;
 import io.github.pheonixhkbxoic.a2a4j.core.core.InMemoryTaskManager;
 import io.github.pheonixhkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
+import io.github.pheonixhkbxoic.a2a4j.core.core.TaskStore;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.ValueError;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.InternalError;
@@ -35,8 +36,9 @@ public class RagTaskManager extends InMemoryTaskManager {
     // agent support modes
     private final List<String> supportModes = Arrays.asList("text", "file", "data");
 
-    public RagTaskManager(@Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
-        this.pushNotificationSenderAuth = pushNotificationSenderAuth;
+    public RagTaskManager(@Autowired TaskStore taskStore,
+                          @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
+        super(taskStore, pushNotificationSenderAuth);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class RagTaskManager extends InMemoryTaskManager {
         }
         // check and set pushNotification
         if (ps.getPushNotification() != null) {
-            boolean verified = this.verifyPushNotificationInfo(ps.getId(), ps.getPushNotification());
+            boolean verified = this.verifyPushNotificationInfo(ps.getPushNotification());
             if (!verified) {
                 return Mono.just(new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid")));
             }
@@ -88,7 +90,7 @@ public class RagTaskManager extends InMemoryTaskManager {
                 }
                 // check and set pushNotification
                 if (ps.getPushNotification() != null) {
-                    boolean verified = this.verifyPushNotificationInfo(taskId, ps.getPushNotification());
+                    boolean verified = this.verifyPushNotificationInfo(ps.getPushNotification());
                     if (!verified) {
                         return new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid"));
                     }

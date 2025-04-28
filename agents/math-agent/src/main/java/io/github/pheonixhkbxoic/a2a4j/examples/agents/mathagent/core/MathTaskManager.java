@@ -3,6 +3,7 @@ package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.core;
 
 import io.github.pheonixhkbxoic.a2a4j.core.core.InMemoryTaskManager;
 import io.github.pheonixhkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
+import io.github.pheonixhkbxoic.a2a4j.core.core.TaskStore;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.ValueError;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.InternalError;
@@ -10,8 +11,6 @@ import io.github.pheonixhkbxoic.a2a4j.core.spec.error.InvalidParamsError;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.message.*;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -26,17 +25,17 @@ import java.util.stream.Collectors;
  * @desc
  */
 @Slf4j
-@Component
 public class MathTaskManager extends InMemoryTaskManager {
     // wire agent
     private final MathAgent mathAgent;
     // agent support modes
     private final List<String> supportModes = Arrays.asList("text", "file", "data");
 
-    public MathTaskManager(@Autowired MathAgent mathAgent, @Autowired PushNotificationSenderAuth pushNotificationSenderAuth) {
+    public MathTaskManager(TaskStore taskStore,
+                           PushNotificationSenderAuth pushNotificationSenderAuth,
+                           MathAgent mathAgent) {
+        super(taskStore, pushNotificationSenderAuth);
         this.mathAgent = mathAgent;
-        // must autowired, keep PushNotificationSenderAuth instance unique global
-        this.pushNotificationSenderAuth = pushNotificationSenderAuth;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class MathTaskManager extends InMemoryTaskManager {
         }
         // check and set pushNotification
         if (ps.getPushNotification() != null) {
-            boolean verified = this.verifyPushNotificationInfo(ps.getId(), ps.getPushNotification());
+            boolean verified = this.verifyPushNotificationInfo(ps.getPushNotification());
             if (!verified) {
                 return Mono.just(new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid")));
             }
@@ -87,7 +86,7 @@ public class MathTaskManager extends InMemoryTaskManager {
                 }
                 // check and set pushNotification
                 if (ps.getPushNotification() != null) {
-                    boolean verified = this.verifyPushNotificationInfo(taskId, ps.getPushNotification());
+                    boolean verified = this.verifyPushNotificationInfo(ps.getPushNotification());
                     if (!verified) {
                         return new SendTaskResponse(request.getId(), new InvalidParamsError("Push notification URL is invalid"));
                     }

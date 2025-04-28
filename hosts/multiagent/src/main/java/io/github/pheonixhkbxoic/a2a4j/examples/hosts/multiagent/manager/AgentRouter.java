@@ -162,9 +162,6 @@ public class AgentRouter {
                     UpdateEvent event = r.getResult();
                     if (event instanceof TaskStatusUpdateEvent) {
                         TaskStatus status = ((TaskStatusUpdateEvent) event).getStatus();
-                        if (!TaskState.WORKING.equals(status.getState()) || status.getMessage() == null) {
-                            return Flux.empty();
-                        }
                         return Flux.fromStream(status.getMessage().getParts().stream());
                     }
                     Artifact artifact = ((TaskArtifactUpdateEvent) r.getResult()).getArtifact();
@@ -173,6 +170,7 @@ public class AgentRouter {
                 .filter(p -> new TextPart().getType().equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
 //                .doOnNext(s -> log.info("client received: {}", s))
+                .filter(s -> s != null && !s.isBlank())
                 .doOnComplete(sink::complete)
                 .doOnError(sink::error)
                 .subscribeOn(Schedulers.boundedElastic())
