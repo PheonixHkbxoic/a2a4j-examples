@@ -2,7 +2,9 @@ package io.github.pheonixhkbxoic.a2a4j.examples.hosts.standalone.controller;
 
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.ValueError;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.error.A2AClientHTTPError;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
@@ -48,16 +51,22 @@ public class AgentController {
         log.info("chat params: {}", Util.toJson(params));
         try {
             String answer = client.sendTask(params)
-                    .map(sendTaskResponse -> {
+                    .flatMap(sendTaskResponse -> {
+                        if (sendTaskResponse.getError() != null) {
+                            return Mono.error(new ValueError(Util.toJson(sendTaskResponse.getError())));
+                        }
                         Task task = sendTaskResponse.getResult();
-                        return task.getArtifacts().stream()
+                        return Mono.just(task.getArtifacts().stream()
                                 .flatMap(t -> t.getParts().stream())
                                 .filter(p -> new TextPart().getType().equals(p.getType()))
                                 .map(p -> ((TextPart) p).getText())
-                                .collect(Collectors.joining("\n"));
+                                .collect(Collectors.joining("\n")));
                     })
                     .block();
             return ResponseEntity.ok(answer);
+        } catch (A2AClientHTTPError e) {
+            log.error("chat exception: {}", e.getMessage(), e);
+            return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         } catch (Exception e) {
             log.error("chat exception: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -87,6 +96,9 @@ public class AgentController {
         responseFlux
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(r -> {
+                    if (r.getError() != null) {
+                        return Flux.error(new ValueError(Util.toJson(r.getError())));
+                    }
                     UpdateEvent event = r.getResult();
                     if (event instanceof TaskStatusUpdateEvent) {
                         Message message = ((TaskStatusUpdateEvent) event).getStatus().getMessage();

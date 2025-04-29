@@ -1,4 +1,4 @@
-package io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.manager;
+package io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.router;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -16,7 +16,6 @@ import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.JsonRpcError;
-import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingResponse;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
 import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.schema.ExecuteContext;
@@ -60,30 +59,33 @@ public class AgentRouter {
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(query))
                 .build();
+        StopWatch stopWatch = new StopWatch();
         return Mono.fromSupplier(() -> {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start("router");
-            String text = model.chat(request).aiMessage().text();
-            log.info("chat response text: {}", text);
-            text = text.replaceFirst("^```json|```$", "");
-            ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
-            // return the answer directly
-            String activeAgent = ec.getResult().getActiveAgent();
-            A2AClient agentClient = clientSet.getByName(activeAgent);
-            stopWatch.stop();
-            if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || agentClient == null) {
-                log.info("chat statistics: {}", stopWatch.prettyPrint());
-                return ec.getResult().getAnswer();
-            }
+                    stopWatch.start("router");
+                    String text = model.chat(request).aiMessage().text();
+                    log.info("chat response text: {}", text);
+                    text = text.replaceFirst("^```json|```$", "");
+                    ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
+                    stopWatch.stop();
+                    return ec;
+                })
+                .flatMap(ec -> {
+                    // return the answer directly
+                    String activeAgent = ec.getResult().getActiveAgent();
+                    A2AClient agentClient = clientSet.getByName(activeAgent);
+                    if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || agentClient == null) {
+                        log.info("chat statistics: {}", stopWatch.prettyPrint());
+                        return Mono.just(ec.getResult().getAnswer());
+                    }
 
-            // route suitable agent
-            stopWatch.start("router agent");
-            String result = routeToAgent(agentClient, sessionId, query).block();
-            stopWatch.stop();
+                    // route suitable agent
+                    stopWatch.start("router agent");
+                    Mono<String> result = routeToAgent(agentClient, sessionId, query);
+                    stopWatch.stop();
 
-            log.info("chat statistics: {}", stopWatch.prettyPrint());
-            return result;
-        });
+                    log.info("chat statistics: {}", stopWatch.prettyPrint());
+                    return result;
+                });
     }
 
     public Flux<String> chatStream(String userId, String sessionId, String query) {
@@ -130,7 +132,7 @@ public class AgentRouter {
         TaskSendParams taskSendParams = TaskSendParams.builder()
                 .id(Uuid.uuid4hex())
                 .sessionId(sessionId)
-                .message(Message.builder().parts(List.of(new TextPart(query))).build())
+                .message(Message.builder().parts(List.of(new TextPart(query))).role(Role.USER).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
         return agentClient.sendTask(taskSendParams)
@@ -152,16 +154,18 @@ public class AgentRouter {
         TaskSendParams taskSendParams = TaskSendParams.builder()
                 .id(Uuid.uuid4hex())
                 .sessionId(sessionId)
-                .message(Message.builder().parts(List.of(new TextPart(query))).build())
+                .message(Message.builder().parts(List.of(new TextPart(query))).role(Role.USER).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
-        Flux<SendTaskStreamingResponse> sendTaskStreamingResponseFlux = agentClient.sendTaskSubscribe(taskSendParams);
-        sendTaskStreamingResponseFlux
+        agentClient.sendTaskSubscribe(taskSendParams)
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(r -> {
                     UpdateEvent event = r.getResult();
                     if (event instanceof TaskStatusUpdateEvent) {
                         TaskStatus status = ((TaskStatusUpdateEvent) event).getStatus();
+                        if (status.getMessage() == null) {
+                            return Flux.empty();
+                        }
                         return Flux.fromStream(status.getMessage().getParts().stream());
                     }
                     Artifact artifact = ((TaskArtifactUpdateEvent) r.getResult()).getArtifact();

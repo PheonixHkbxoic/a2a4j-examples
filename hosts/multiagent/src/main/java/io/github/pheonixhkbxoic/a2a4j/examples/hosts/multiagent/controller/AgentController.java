@@ -1,7 +1,7 @@
 package io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.controller;
 
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.A2AClientHTTPError;
-import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.manager.AgentRouter;
+import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.router.AgentRouter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -28,12 +28,12 @@ public class AgentController {
                                        @RequestParam("sessionId") String sessionId,
                                        @RequestParam("prompts") String prompts) {
         Mono<String> result = this.agentRouter.chat(userId, sessionId, prompts);
-        String block = null;
+        String block;
         try {
             block = result.block();
         } catch (A2AClientHTTPError e) {
             log.error("chat status: {}, error: {}", e.getStatusCode(), e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         } catch (Exception e) {
             log.error("chat error: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body(e.getMessage());

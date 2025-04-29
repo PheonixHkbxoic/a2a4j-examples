@@ -24,7 +24,7 @@ public class NotificationListener extends WebMvcNotificationAdapter {
             if (verifyFailCount.get() != 0) {
                 this.reloadJwks();
             }
-        }, 1, 1, TimeUnit.MINUTES);
+        }, 5, 5, TimeUnit.SECONDS);
     }
 
 }

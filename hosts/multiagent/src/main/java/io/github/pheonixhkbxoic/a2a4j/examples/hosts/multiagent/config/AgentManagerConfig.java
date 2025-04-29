@@ -3,7 +3,7 @@ package io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.config;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
-import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.manager.AgentRouter;
+import io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.router.AgentRouter;
 import io.github.pheonixhkbxoic.a2a4j.host.autoconfiguration.A2a4jAgentsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
