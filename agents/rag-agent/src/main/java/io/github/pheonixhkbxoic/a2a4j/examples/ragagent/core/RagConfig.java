@@ -34,7 +34,7 @@ public class RagConfig {
         agentCard.setName("ragAgent");
         agentCard.setDescription("Miles of Smiles Car Rental Services Terms of Use");
         agentCard.setUrl("http://127.0.0.1:" + port);
-        agentCard.setVersion("2.0.0");
+        agentCard.setVersion("2.0.1");
         agentCard.setCapabilities(capabilities);
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;

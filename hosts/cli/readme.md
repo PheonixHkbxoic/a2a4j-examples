@@ -13,7 +13,7 @@ mvn clean package
 ## run jar
 
 ```cmd
-java -jar .\target\cli-2.0.0.jar  -u http://127.0.0.1:8901 -s
+java -jar .\target\cli-2.0.1.jar  -u http://127.0.0.1:8901 -s
 ```
 
 answer:
