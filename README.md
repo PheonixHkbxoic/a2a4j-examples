@@ -287,7 +287,7 @@ Features:
                 if (verifyFailCount.get() != 0) {
                     this.reloadJwks();
                 }
-            }, 1, 1, TimeUnit.MINUTES);
+            }, 5, 5, TimeUnit.SECONDS);
         }
         // TODO 实现方法来处理通知，可以使用默认实现
     }
