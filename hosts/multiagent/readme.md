@@ -2,18 +2,18 @@
 
 ## not found suitable agent
 
-question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=hello,%20Master%20Yoda!  
+question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=hello,%20Master%20Yoda%21  
 answer: Hello there! How can I assist you today?
 
-question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=hello,%20Master%20Yoda!  
+question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=hello,%20Master%20Yoda%21  
 answer: hello, Master Yoda!
 
 ## found agent: echoAgent
 
-question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=please%20just%20echo:%20hello,%20Master%20Yoda!  
+question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=please%20just%20echo:%20hello,%20Master%20Yoda%21  
 answer: I'm echo agent! echo: please just echo: hello, Master Yoda
 
-question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=please%20just%20echo:%20hello,%20Master%20Yoda!  
+question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=please%20just%20echo:%20hello,%20Master%20Yoda%21  
 answer:
 
 - sse message: 1
@@ -39,7 +39,7 @@ answer:
 
 ## found agent: ragAgent
 
-question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=what%20is%20miles  
+question: http://localhost:8900/chat?userId=1&sessionId=2&prompts=what%20is%20miles%20of%20Smiles    
 answer:  
 At **Miles of Smiles Car Rental Services**, "Miles" refers to:
 
@@ -59,7 +59,7 @@ Would you like me to check:
 
 I'm happy to provide details relevant to your rental needs!
 
-question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=what%20is%20miles  
+question: http://localhost:8900/completed?userId=1&sessionId=2&prompts=what%20is%20miles%20of%20Smiles  
 answer(stream):  
 At **Miles of Smiles Car Rental Services**, "Miles" refers to our company name and brand. We are a car rental
 service

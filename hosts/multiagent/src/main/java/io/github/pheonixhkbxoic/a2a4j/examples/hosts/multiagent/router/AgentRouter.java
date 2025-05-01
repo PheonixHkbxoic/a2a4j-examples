@@ -74,16 +74,17 @@ public class AgentRouter {
                     String activeAgent = ec.getResult().getActiveAgent();
                     A2AClient agentClient = clientSet.getByName(activeAgent);
                     if (ExecuteContext.DEFAULT_AGENT_NAME.equals(activeAgent) || agentClient == null) {
-                        log.info("chat statistics: {}", stopWatch.prettyPrint());
+                        log.debug("chat statistics: {}", stopWatch.prettyPrint());
                         return Mono.just(ec.getResult().getAnswer());
                     }
 
                     // route suitable agent
                     stopWatch.start("router agent");
+                    log.debug("route to agent: {}", activeAgent);
                     Mono<String> result = routeToAgent(agentClient, sessionId, query);
                     stopWatch.stop();
 
-                    log.info("chat statistics: {}", stopWatch.prettyPrint());
+                    log.debug("chat statistics: {}", stopWatch.prettyPrint());
                     return result;
                 });
     }
@@ -104,7 +105,7 @@ public class AgentRouter {
                 @Override
                 public void onCompleteResponse(ChatResponse chatResponse) {
                     String text = cache.toString();
-                    log.info("chatStream response text: {}", text);
+                    log.debug("chatStream router response: {}", text);
                     text = text.replaceFirst("^```json|```$", "");
                     ExecuteContext ec = Util.fromJson(text, ExecuteContext.class);
                     // return the answer directly
@@ -116,6 +117,7 @@ public class AgentRouter {
                         sink.complete();
                     } else {
                         // route suitable agent
+                        log.debug("chatStream route to agent: {}", activeAgent);
                         routerToAgentStream(agentClient, sessionId, query, sink);
                     }
                 }
@@ -209,7 +211,7 @@ public class AgentRouter {
                                 """)
                 .apply(dataVars)
                 .toSystemMessage();
-        log.info("systemMessage: {}", systemMessage.text());
+        log.debug("systemMessage: {}", systemMessage.text());
         return systemMessage;
     }
 

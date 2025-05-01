@@ -3,6 +3,7 @@ package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.publisher.Mono;
 
 /**
  * @author PheonixHkbxoic
@@ -14,7 +15,7 @@ public class IndexController {
 
     @ResponseBody
     @GetMapping("/echo")
-    public String index() {
-        return "echo app";
+    public Mono<String> index() {
+        return Mono.just("echo app");
     }
 }

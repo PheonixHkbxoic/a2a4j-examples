@@ -3,15 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.pheonixhkbxoic</groupId>
-        <artifactId>hosts</artifactId>
+        <artifactId>a2a4j-examples</artifactId>
         <version>2.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>multiagent</artifactId>
     <packaging>jar</packaging>
 
-    <name>multiagent</name>
-    <url>http://maven.apache.org</url>
+    <name>${project.parent.artifactId}:hosts:${project.artifactId}</name>
+    <description>a2a4j host example: multiagent</description>
+    <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

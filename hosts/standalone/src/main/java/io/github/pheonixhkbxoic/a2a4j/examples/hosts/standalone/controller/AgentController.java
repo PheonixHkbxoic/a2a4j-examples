@@ -60,6 +60,7 @@ public class AgentController {
                                 .flatMap(t -> t.getParts().stream())
                                 .filter(p -> new TextPart().getType().equals(p.getType()))
                                 .map(p -> ((TextPart) p).getText())
+                                .filter(t -> !Util.isEmpty(t))
                                 .collect(Collectors.joining("\n")));
                     })
                     .block();
@@ -112,6 +113,7 @@ public class AgentController {
                 })
                 .filter(p -> new TextPart().getType().equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
+                .filter(t -> !Util.isEmpty(t))
                 .doOnNext(s -> log.info("client received: {}", s))
                 .doOnComplete(sseEmitter::complete)
                 .doOnError(sseEmitter::completeWithError)

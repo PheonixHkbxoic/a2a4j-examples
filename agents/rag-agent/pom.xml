@@ -3,15 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.pheonixhkbxoic</groupId>
-        <artifactId>agents</artifactId>
+        <artifactId>a2a4j-examples</artifactId>
         <version>2.0.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>rag-agent</artifactId>
     <packaging>jar</packaging>
 
-    <name>rag-agent</name>
-    <url>http://maven.apache.org</url>
+    <name>${project.parent.artifactId}:agents:${project.artifactId}</name>
+    <description>a2a4j agent example: ${project.artifactId}</description>
+    <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

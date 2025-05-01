@@ -1,2 +1,8 @@
 server:
   port: 8901
+
+
+
+logging:
+  level:
+    io.github.pheonixhkbxoic.a2a4j: debug

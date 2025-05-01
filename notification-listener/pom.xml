@@ -10,8 +10,8 @@
     <artifactId>notification-listener</artifactId>
     <packaging>jar</packaging>
 
-    <name>notification-listener</name>
-    <description>a2a4j example: notification-listener</description>
+    <name>${project.parent.artifactId}:${project.artifactId}</name>
+    <description>a2a4j examples: ${project.artifactId}</description>
     <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <properties>

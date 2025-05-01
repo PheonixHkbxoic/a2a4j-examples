@@ -16,3 +16,6 @@ a2a4j:
       ragAgent:
         baseUrl: http://127.0.0.1:8903
 
+logging:
+  level:
+    io.github.pheonixhkbxoic.a2a4j: debug

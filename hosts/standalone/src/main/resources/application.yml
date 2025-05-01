@@ -4,10 +4,16 @@ server:
 
 a2a4j:
   host:
-    # can be null
+    # global notification
     notification:
       url: http://127.0.0.1:8989/notify
 
     agents:
       echoAgent:
         baseUrl: http://127.0.0.1:8901
+        #notification:
+        #  url: http://127.0.0.1:8989/notify
+
+logging:
+  level:
+    io.github.pheonixhkbxoic.a2a4j: debug

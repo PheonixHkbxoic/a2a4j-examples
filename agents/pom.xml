@@ -10,8 +10,8 @@
     <artifactId>agents</artifactId>
     <packaging>pom</packaging>
 
-    <name>agents</name>
-    <description>a2a4j examples</description>
+    <name>${project.parent.artifactId}:${project.artifactId}</name>
+    <description>a2a4j examples: ${project.artifactId}</description>
     <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <modules>
@@ -23,5 +23,5 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    
+
 </project>

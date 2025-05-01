@@ -9,10 +9,15 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
+import io.github.pheonixhkbxoic.a2a4j.core.core.AgentInvoker;
+import io.github.pheonixhkbxoic.a2a4j.core.core.StreamData;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskRequest;
+import io.github.pheonixhkbxoic.a2a4j.core.spec.message.SendTaskStreamingRequest;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
 import io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.tool.Calculator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,8 +33,9 @@ import java.util.stream.Collectors;
  * @date 2025/4/14 15:34
  * @desc math agent: use LangChain4j low level  api
  */
+@Component
 @Slf4j
-public class MathAgent {
+public class MathAgent implements AgentInvoker {
     private ChatLanguageModel model;
     private StreamingChatLanguageModel streamingModel;
     private final Calculator calculator = new Calculator();
@@ -57,7 +63,7 @@ public class MathAgent {
             }
     );
 
-    Mono<String> chat(String sessionId, String prompt) {
+    Mono<List<Artifact>> chat(String sessionId, String prompt) {
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(prompt))
                 .toolSpecifications(ToolSpecifications.toolSpecificationsFrom(Calculator.class))
@@ -76,7 +82,7 @@ public class MathAgent {
                 text = text + result;
             }
             log.info("question: {}, answer: {}, toolExecuted: {}", prompt, text, toolExecuted);
-            return text;
+            return List.of(Artifact.builder().parts(List.of(new TextPart(text))).build());
         });
     }
 
@@ -101,7 +107,7 @@ public class MathAgent {
                 .collect(Collectors.joining("\n"));
     }
 
-    public Flux<TaskStatus> chatStream(String sessionId, String prompt) {
+    public Flux<StreamData> chatStream(String sessionId, String prompt) {
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(prompt))
                 .toolSpecifications(ToolSpecifications.toolSpecificationsFrom(Calculator.class))
@@ -113,8 +119,11 @@ public class MathAgent {
             public void onPartialResponse(String text) {
                 List<Part> parts = Collections.singletonList(new TextPart(text));
                 Message message = new Message(Role.AGENT, parts, null);
-                TaskStatus taskStatus = new TaskStatus(TaskState.WORKING, message);
-                sink.next(taskStatus);
+                StreamData streamData = StreamData.builder()
+                        .state(TaskState.WORKING)
+                        .message(message)
+                        .build();
+                sink.next(streamData);
             }
 
             @Override
@@ -124,9 +133,15 @@ public class MathAgent {
                     String result = that.invokeTools(aiMessage);
                     log.info("question: {}, tool result: {}", prompt, result);
                     List<Part> parts = Collections.singletonList(new TextPart(result));
-                    Message message = new Message(Role.AGENT, parts, null);
-                    TaskStatus taskStatus = new TaskStatus(TaskState.COMPLETED, message);
-                    sink.next(taskStatus);
+                    Artifact artifact = Artifact.builder().name("mathAgent").parts(parts).build();
+                    Message message = new Message(Role.AGENT, List.of(), null);
+                    StreamData streamData = StreamData.builder()
+                            .state(TaskState.COMPLETED)
+                            .message(message)
+                            .artifact(artifact)
+                            .endStream(true)
+                            .build();
+                    sink.next(streamData);
                 }
                 sink.complete();
             }
@@ -138,4 +153,15 @@ public class MathAgent {
         }));
     }
 
+    @Override
+    public Mono<List<Artifact>> invoke(SendTaskRequest request) {
+        TaskSendParams params = request.getParams();
+        return this.chat(params.getSessionId(), this.extractUserQuery(params));
+    }
+
+    @Override
+    public Flux<StreamData> invokeStream(SendTaskStreamingRequest request) {
+        TaskSendParams params = request.getParams();
+        return this.chatStream(params.getSessionId(), this.extractUserQuery(params));
+    }
 }

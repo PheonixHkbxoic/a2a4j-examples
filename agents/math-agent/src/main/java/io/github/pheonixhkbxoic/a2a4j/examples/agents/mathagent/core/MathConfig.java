@@ -1,10 +1,6 @@
 package io.github.pheonixhkbxoic.a2a4j.examples.agents.mathagent.core;
 
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import io.github.pheonixhkbxoic.a2a4j.core.core.PushNotificationSenderAuth;
-import io.github.pheonixhkbxoic.a2a4j.core.core.TaskStore;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentCapabilities;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentCard;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.AgentSkill;
@@ -47,14 +43,5 @@ public class MathConfig {
         return agentCard;
     }
 
-    @Bean
-    public MathAgent mathAgent(ChatLanguageModel chatLanguageModel, StreamingChatLanguageModel streamingChatLanguageModel) {
-        return new MathAgent(chatLanguageModel, streamingChatLanguageModel);
-    }
-    
-    @Bean
-    public MathTaskManager mathTaskManager(TaskStore taskStore, PushNotificationSenderAuth pushNotificationSenderAuth, MathAgent mathAgent) {
-        return new MathTaskManager(taskStore, pushNotificationSenderAuth, mathAgent);
-    }
 
 }

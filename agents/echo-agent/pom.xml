@@ -11,8 +11,8 @@
     <artifactId>echo-agent</artifactId>
     <packaging>jar</packaging>
 
-    <name>echo-agent</name>
-    <description>a2a4j agent example: echo-agent</description>
+    <name>${project.parent.artifactId}:agents:${project.artifactId}</name>
+    <description>a2a4j agent example: ${project.artifactId}</description>
     <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <properties>
@@ -27,7 +27,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
         </dependency>
     </dependencies>
 </project>
