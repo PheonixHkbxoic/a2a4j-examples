@@ -170,7 +170,7 @@ Features:
           url: http://127.0.0.1:8989/notify
     
         agents:
-          agent-001:
+          echoAgent:
             baseUrl: http://127.0.0.1:8901
     
     ```
