@@ -363,7 +363,7 @@ Features:
 * [multiagent](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/hosts/multiagent)
   one router agent, multi other agent
 * [agent-router-adk](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/jdk17/hosts/agent-router-adk)  
-  one router agent, multi other agent with [adk-java](https://github.com/PheonixHkbxoic/adk-java)
+  one router agent, multi other agent with [adk-java](https://github.com/PheonixHkbxoic/adk-java)  
   ![Agent Router](https://img.plantuml.biz/plantuml/png/ZP7D3e8m3CVlItY79bnq2Iy01F4Ll1eFOrGWpWt7Y0VZkxiDyMDguWxBslxwRzUMWs7QZ4SH4V-AI6_lpdHA0gNh1gNPgD6WfXGk4G58jh76UfSKpeWRZIXJoBaIIgSsKEHLuOMo3tWuTuQtYm0-iKb_1Ki70N0s88GKybRvPcOgq7RdUpEFpEn7uhtUaPasg90-dTaRksT2L8mVNj7PvqcKzVJRFoTc-N1ULxSGrKUaj46_dni0)
 
 ## Star History
