@@ -15,6 +15,7 @@
         <module>hosts</module>
         <module>agents</module>
         <module>notification-listener</module>
+        <module>hosts/agent-router-adk</module>
     </modules>
 
     <properties>

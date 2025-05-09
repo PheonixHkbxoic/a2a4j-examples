@@ -101,7 +101,6 @@ Features:
    `http://{your_server_domain}/.well-known/agent.json`
    来获取AgentCard
 
-
 3. 实现自定义AgentInvoker
 
     ```java
@@ -143,7 +142,6 @@ Features:
 
     * 需要实现`AgentInvoker`接口，处理agent的调用与转换
 
-
 4. 代码参考  
    [a2a4j-examples agents/echo-agent](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/agents/echo-agent)
 
@@ -177,7 +175,6 @@ Features:
 
     * 必须配置Agent Server的baseUrl，可配置多个
     * 选择性的配置Notification Server的baseUrl
-
 
 3. 发送任务请求并处理响应
 
@@ -269,7 +266,6 @@ Features:
     * 必须配置jwksUrls，可配置多个
     * 选择性的配置endpoint, 不配置时默认监听`/notify`, AgentServer中的配置`a2a4j.host.notification:`
 
-
 3. 自定义监听器并实例化
 
     ```java
@@ -300,7 +296,6 @@ Features:
     * 注入配置属性`@Autowired A2a4jNotificationProperties a2a4jNotificationProperties`
       并通过`super(a2a4jNotificationProperties.getEndpoint(), a2a4jNotificationProperties.getJwksUrls());`实例化
       `PushNotificationReceiverAuth`和监听指定的地址
-
 
 4. 代码参考  
    [a2a4j-examples notification-listener](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/notification-listener)
@@ -360,6 +355,16 @@ Features:
 
 3. 代码参考  
    [a2a4j-examples hosts cli](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/hosts/cli)
+
+### hosts
+
+* [cli](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/hosts/cli)
+* [standalone](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/hosts/standalone)
+* [multiagent](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main/hosts/multiagent)
+  one router agent, multi other agent
+* [agent-router-adk](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/jdk17/hosts/agent-router-adk)  
+  one router agent, multi other agent with [adk-java](https://github.com/PheonixHkbxoic/adk-java)
+  ![Agent Router](https://img.plantuml.biz/plantuml/png/ZP7D3e8m3CVlItY79bnq2Iy01F4Ll1eFOrGWpWt7Y0VZkxiDyMDguWxBslxwRzUMWs7QZ4SH4V-AI6_lpdHA0gNh1gNPgD6WfXGk4G58jh76UfSKpeWRZIXJoBaIIgSsKEHLuOMo3tWuTuQtYm0-iKb_1Ki70N0s88GKybRvPcOgq7RdUpEFpEn7uhtUaPasg90-dTaRksT2L8mVNj7PvqcKzVJRFoTc-N1ULxSGrKUaj46_dni0)
 
 ## Star History
 

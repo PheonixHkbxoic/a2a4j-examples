@@ -1,0 +1,21 @@
+server:
+  port: 8900
+
+
+a2a4j:
+  host:
+    # can be null
+    notification:
+      url: http://127.0.0.1:8989/notify
+
+    agents:
+      echoAgent:
+        baseUrl: http://127.0.0.1:8901
+      mathAgent:
+        baseUrl: http://127.0.0.1:8902
+      ragAgent:
+        baseUrl: http://127.0.0.1:8903
+
+logging:
+  level:
+    io.github.pheonixhkbxoic.a2a4j: debug
