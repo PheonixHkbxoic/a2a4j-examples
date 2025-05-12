@@ -3,7 +3,8 @@ package io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.controller;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.A2AClientHTTPError;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Uuid;
 import io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.router.Assistant;
-import io.github.pheonixhkbxoic.adk.Payload;
+import io.github.pheonixhkbxoic.adk.message.AdkPayload;
+import io.github.pheonixhkbxoic.adk.message.AdkTextMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,11 +38,11 @@ public class AssistantController {
     public ResponseEntity<Map<String, Object>> chat(@RequestParam("userId") String userId,
                                                     @RequestParam("sessionId") String sessionId,
                                                     @RequestParam("prompts") String prompts) {
-        Payload payload = Payload.builder()
+        AdkPayload payload = AdkPayload.builder()
                 .userId(userId)
                 .sessionId(sessionId)
                 .taskId(Uuid.uuid4hex())
-                .message(prompts)
+                .messages(List.of(AdkTextMessage.of(prompts)))
                 .build();
         Mono<Map<String, Object>> result = this.assistant.chat(payload);
         Map<String, Object> data;
@@ -61,11 +63,11 @@ public class AssistantController {
     public Flux<Map<String, Object>> completed(@RequestParam("userId") String userId,
                                                @RequestParam("sessionId") String sessionId,
                                                @RequestParam("prompts") String prompts) {
-        Payload payload = Payload.builder()
+        AdkPayload payload = AdkPayload.builder()
                 .userId(userId)
                 .sessionId(sessionId)
                 .taskId(Uuid.uuid4hex())
-                .message(prompts)
+                .messages(List.of(AdkTextMessage.of(prompts)))
                 .build();
         return this.assistant.chatStream(payload);
     }
@@ -75,7 +77,7 @@ public class AssistantController {
     public ResponseEntity<ByteArrayResource> generatePng(@RequestParam("userId") String userId,
                                                          @RequestParam("sessionId") String sessionId,
                                                          @RequestParam("taskId") String taskId) {
-        Payload payload = Payload.builder()
+        AdkPayload payload = AdkPayload.builder()
                 .userId(userId)
                 .sessionId(sessionId)
                 .taskId(taskId)

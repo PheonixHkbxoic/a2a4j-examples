@@ -3,12 +3,16 @@ package io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.router;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
 import io.github.pheonixhkbxoic.a2a4j.host.autoconfiguration.A2a4jAgentsProperties;
-import io.github.pheonixhkbxoic.adk.AdkAgentProvider;
-import io.github.pheonixhkbxoic.adk.Payload;
+import io.github.pheonixhkbxoic.adk.context.ExecutableContext;
+import io.github.pheonixhkbxoic.adk.core.AdkAgentProvider;
 import io.github.pheonixhkbxoic.adk.core.edge.DefaultRouterSelector;
 import io.github.pheonixhkbxoic.adk.event.InMemoryEventService;
+import io.github.pheonixhkbxoic.adk.message.AdkPayload;
+import io.github.pheonixhkbxoic.adk.message.ResponseFrame;
 import io.github.pheonixhkbxoic.adk.runner.AgentRouterRunner;
-import io.github.pheonixhkbxoic.adk.runtime.*;
+import io.github.pheonixhkbxoic.adk.runtime.AdkAgentInvoker;
+import io.github.pheonixhkbxoic.adk.runtime.BranchSelector;
+import io.github.pheonixhkbxoic.adk.runtime.Executor;
 import io.github.pheonixhkbxoic.adk.session.InMemorySessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.router.RouterAgent.ACTIVE_AGENT;
 
@@ -44,21 +49,23 @@ public class Assistant {
         this.runner = this.buildRunner();
     }
 
-    public Mono<Map<String, Object>> chat(Payload payload) {
+    public Mono<Map<String, Object>> chat(AdkPayload payload) {
         return Mono.fromSupplier(() -> {
-            String message = this.runner.run(payload).getMessage();
+            String message = this.runner.run(payload).stream()
+                    .map(ResponseFrame::getMessage)
+                    .collect(Collectors.joining("\n"));
             return Map.of("answer", message, "payload", payload);
         });
     }
 
-    public Flux<Map<String, Object>> chatStream(Payload payload) {
+    public Flux<Map<String, Object>> chatStream(AdkPayload payload) {
         return this.runner.runAsync(payload).map(responseFrame -> {
             String message = responseFrame.getMessage();
             return Map.of("answer", message, "payload", payload);
         });
     }
 
-    public ByteArrayResource generatePng(Payload payload) {
+    public ByteArrayResource generatePng(AdkPayload payload) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             this.runner.generateTaskPng(payload, baos);

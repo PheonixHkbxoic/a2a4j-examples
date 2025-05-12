@@ -5,9 +5,11 @@ import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClient;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.entity.*;
 import io.github.pheonixhkbxoic.a2a4j.core.spec.error.JsonRpcError;
 import io.github.pheonixhkbxoic.a2a4j.host.autoconfiguration.A2a4jAgentsProperties;
+import io.github.pheonixhkbxoic.adk.context.ExecutableContext;
+import io.github.pheonixhkbxoic.adk.message.AdkFileMessage;
+import io.github.pheonixhkbxoic.adk.message.AdkTextMessage;
+import io.github.pheonixhkbxoic.adk.message.ResponseFrame;
 import io.github.pheonixhkbxoic.adk.runtime.AdkAgentInvoker;
-import io.github.pheonixhkbxoic.adk.runtime.ExecutableContext;
-import io.github.pheonixhkbxoic.adk.runtime.ResponseFrame;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -33,12 +35,23 @@ public class RemoteAgent implements AdkAgentInvoker {
     public Mono<ResponseFrame> invoke(ExecutableContext context) {
         String sessionId = context.getPayload().getSessionId();
         String taskId = context.getPayload().getTaskId();
-        String query = context.getPayload().getMessage();
+        List<Part> parts = context.getPayload().getMessages().stream()
+                .map(m -> {
+                    if (m instanceof AdkTextMessage) {
+                        return new TextPart("text", m.getMetadata(), ((AdkTextMessage) m).getText());
+                    }
+                    FileContent content = new FileContent();
+                    content.setMimeType(m.getMimeType());
+                    content.setUri(m.getUrl());
+                    content.setBytes(new String(((AdkFileMessage) m).getData()));
+                    return new FilePart("file", m.getMetadata(), content);
+                })
+                .toList();
 
         TaskSendParams taskSendParams = TaskSendParams.builder()
                 .id(taskId)
                 .sessionId(sessionId)
-                .message(Message.builder().parts(List.of(new TextPart(query))).role(Role.USER).build())
+                .message(Message.builder().parts(parts).role(Role.USER).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
         return agentClient.sendTask(taskSendParams)
@@ -62,12 +75,24 @@ public class RemoteAgent implements AdkAgentInvoker {
     public Flux<ResponseFrame> invokeStream(ExecutableContext context) {
         String sessionId = context.getPayload().getSessionId();
         String taskId = context.getPayload().getTaskId();
-        String query = context.getPayload().getMessage();
+        List<Part> parts = context.getPayload().getMessages().stream()
+                .map(m -> {
+                    if (m instanceof AdkTextMessage) {
+                        return new TextPart("text", m.getMetadata(), ((AdkTextMessage) m).getText());
+                    }
+                    FileContent content = new FileContent();
+                    content.setName(m.getName());
+                    content.setMimeType(m.getMimeType());
+                    content.setUri(m.getUrl());
+                    content.setBytes(new String(((AdkFileMessage) m).getData()));
+                    return new FilePart("file", m.getMetadata(), content);
+                })
+                .toList();
 
         TaskSendParams taskSendParams = TaskSendParams.builder()
                 .id(taskId)
                 .sessionId(sessionId)
-                .message(Message.builder().parts(List.of(new TextPart(query))).role(Role.USER).build())
+                .message(Message.builder().parts(parts).role(Role.USER).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
         return Flux.create(sink -> agentClient.sendTaskSubscribe(taskSendParams)

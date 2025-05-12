@@ -7,10 +7,11 @@ import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.input.PromptTemplate;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
 import io.github.pheonixhkbxoic.a2a4j.core.util.Util;
-import io.github.pheonixhkbxoic.adk.Payload;
+import io.github.pheonixhkbxoic.adk.context.ExecutableContext;
+import io.github.pheonixhkbxoic.adk.message.AdkPayload;
+import io.github.pheonixhkbxoic.adk.message.AdkTextMessage;
+import io.github.pheonixhkbxoic.adk.message.ResponseFrame;
 import io.github.pheonixhkbxoic.adk.runtime.AdkAgentInvoker;
-import io.github.pheonixhkbxoic.adk.runtime.ExecutableContext;
-import io.github.pheonixhkbxoic.adk.runtime.ResponseFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author PheonixHkbxoic
@@ -40,10 +42,13 @@ public class RouterAgent implements AdkAgentInvoker {
     @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseFrame> invoke(ExecutableContext context) {
-        Payload payload = context.getPayload();
+        AdkPayload payload = context.getPayload();
         String userId = payload.getUserId();
         String sessionId = payload.getSessionId();
-        String query = payload.getMessage();
+        String query = payload.getMessages().stream()
+                .filter(m -> m instanceof AdkTextMessage)
+                .map(m -> ((AdkTextMessage) m).getText())
+                .collect(Collectors.joining("\n"));
         SystemMessage systemMessage = this.buildSystemMessage(userId, sessionId);
         ChatRequest request = ChatRequest.builder()
                 .messages(systemMessage, UserMessage.from(query))
