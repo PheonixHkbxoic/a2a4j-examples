@@ -168,7 +168,7 @@ public class CliApp {
                         Task task = sendTaskResponse.getResult();
                         return Mono.just(task.getArtifacts().stream()
                                 .flatMap(t -> t.getParts().stream())
-                                .filter(p -> new TextPart().getType().equals(p.getType()))
+                                .filter(p -> Part.TEXT.equals(p.getType()))
                                 .map(p -> ((TextPart) p).getText())
                                 .filter(t -> !Util.isEmpty(t))
                                 .collect(Collectors.joining("\n")));
@@ -208,7 +208,7 @@ public class CliApp {
                     Artifact artifact = ((TaskArtifactUpdateEvent) r.getResult()).getArtifact();
                     return Flux.fromStream(artifact.getParts().stream());
                 })
-                .filter(p -> new TextPart().getType().equals(p.getType()))
+                .filter(p -> Part.TEXT.equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
                 .filter(t -> !Util.isEmpty(t))
                 .doFirst(() -> System.out.printf("[%s:%s] ", sessionId, params.getId()))
@@ -231,7 +231,7 @@ public class CliApp {
                         return Mono.just(task.getHistory().stream()
                                 .filter(t -> t.getParts() != null)
                                 .flatMap(t -> t.getParts().stream())
-                                .filter(p -> new TextPart().getType().equals(p.getType()))
+                                .filter(p -> Part.TEXT.equals(p.getType()))
                                 .map(p -> ((TextPart) p).getText())
                                 .filter(t -> !Util.isEmpty(t))
                                 .collect(Collectors.joining("\n")));

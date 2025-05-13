@@ -38,13 +38,13 @@ public class RemoteAgent implements AdkAgentInvoker {
         List<Part> parts = context.getPayload().getMessages().stream()
                 .map(m -> {
                     if (m instanceof AdkTextMessage) {
-                        return new TextPart("text", m.getMetadata(), ((AdkTextMessage) m).getText());
+                        return new TextPart(((AdkTextMessage) m).getText(), m.getMetadata());
                     }
                     FileContent content = new FileContent();
                     content.setMimeType(m.getMimeType());
                     content.setUri(m.getUrl());
                     content.setBytes(new String(((AdkFileMessage) m).getData()));
-                    return new FilePart("file", m.getMetadata(), content);
+                    return new FilePart(content, m.getMetadata());
                 })
                 .toList();
 
@@ -62,7 +62,7 @@ public class RemoteAgent implements AdkAgentInvoker {
                     }
                     String answer = sendTaskResponse.getResult().getArtifacts().stream()
                             .flatMap(a -> a.getParts().stream())
-                            .filter(p -> p.getType().equals(new TextPart().getType()))
+                            .filter(p -> p.getType().equals(Part.TEXT))
                             .map(p -> ((TextPart) p).getText())
                             .collect(Collectors.joining());
                     ResponseFrame responseFrame = new ResponseFrame();
@@ -78,14 +78,14 @@ public class RemoteAgent implements AdkAgentInvoker {
         List<Part> parts = context.getPayload().getMessages().stream()
                 .map(m -> {
                     if (m instanceof AdkTextMessage) {
-                        return new TextPart("text", m.getMetadata(), ((AdkTextMessage) m).getText());
+                        return new TextPart(((AdkTextMessage) m).getText(), m.getMetadata());
                     }
                     FileContent content = new FileContent();
                     content.setName(m.getName());
                     content.setMimeType(m.getMimeType());
                     content.setUri(m.getUrl());
                     content.setBytes(new String(((AdkFileMessage) m).getData()));
-                    return new FilePart("file", m.getMetadata(), content);
+                    return new FilePart(content, m.getMetadata());
                 })
                 .toList();
 
@@ -109,7 +109,7 @@ public class RemoteAgent implements AdkAgentInvoker {
                     Artifact artifact = ((TaskArtifactUpdateEvent) r.getResult()).getArtifact();
                     return Flux.fromStream(artifact.getParts().stream());
                 })
-                .filter(p -> new TextPart().getType().equals(p.getType()))
+                .filter(p -> Part.TEXT.equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
 //                .doOnNext(s -> log.info("client received: {}", s))
                 .filter(s -> s != null && !s.isBlank())

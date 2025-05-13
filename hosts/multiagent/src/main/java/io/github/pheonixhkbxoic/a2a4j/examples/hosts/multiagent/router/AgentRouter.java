@@ -145,7 +145,7 @@ public class AgentRouter {
                     }
                     return sendTaskResponse.getResult().getArtifacts().stream()
                             .flatMap(a -> a.getParts().stream())
-                            .filter(p -> p.getType().equals(new TextPart().getType()))
+                            .filter(p -> p.getType().equals(Part.TEXT))
                             .map(p -> ((TextPart) p).getText())
                             .collect(Collectors.joining());
                 });
@@ -173,7 +173,7 @@ public class AgentRouter {
                     Artifact artifact = ((TaskArtifactUpdateEvent) r.getResult()).getArtifact();
                     return Flux.fromStream(artifact.getParts().stream());
                 })
-                .filter(p -> new TextPart().getType().equals(p.getType()))
+                .filter(p -> Part.TEXT.equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
 //                .doOnNext(s -> log.info("client received: {}", s))
                 .filter(s -> s != null && !s.isBlank())
