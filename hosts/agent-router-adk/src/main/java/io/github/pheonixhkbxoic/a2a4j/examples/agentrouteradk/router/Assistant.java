@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.router.RouterAgent.ACTIVE_AGENT;
@@ -49,20 +48,14 @@ public class Assistant {
         this.runner = this.buildRunner();
     }
 
-    public Mono<Map<String, Object>> chat(AdkPayload payload) {
-        return Mono.fromSupplier(() -> {
-            String message = this.runner.run(payload).stream()
-                    .map(ResponseFrame::getMessage)
-                    .collect(Collectors.joining("\n"));
-            return Map.of("answer", message, "payload", payload);
-        });
+    public Mono<String> chat(AdkPayload payload) {
+        return Mono.just(this.runner.run(payload).stream()
+                .map(ResponseFrame::getMessage)
+                .collect(Collectors.joining("\n")));
     }
 
-    public Flux<Map<String, Object>> chatStream(AdkPayload payload) {
-        return this.runner.runAsync(payload).map(responseFrame -> {
-            String message = responseFrame.getMessage();
-            return Map.of("answer", message, "payload", payload);
-        });
+    public Flux<String> chatStream(AdkPayload payload) {
+        return this.runner.runAsync(payload).map(ResponseFrame::getMessage);
     }
 
     public ByteArrayResource generatePng(AdkPayload payload) {

@@ -65,9 +65,7 @@ public class RemoteAgent implements AdkAgentInvoker {
                             .filter(p -> p.getType().equals(Part.TEXT))
                             .map(p -> ((TextPart) p).getText())
                             .collect(Collectors.joining());
-                    ResponseFrame responseFrame = new ResponseFrame();
-                    responseFrame.setMessage(answer);
-                    return responseFrame;
+                    return ResponseFrame.of(answer);
                 });
     }
 
@@ -95,7 +93,7 @@ public class RemoteAgent implements AdkAgentInvoker {
                 .message(Message.builder().parts(parts).role(Role.USER).build())
                 .pushNotification(a2a4jAgentsProperties.getNotification())
                 .build();
-        return Flux.create(sink -> agentClient.sendTaskSubscribe(taskSendParams)
+        return agentClient.sendTaskSubscribe(taskSendParams)
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(r -> {
                     UpdateEvent event = r.getResult();
@@ -111,16 +109,8 @@ public class RemoteAgent implements AdkAgentInvoker {
                 })
                 .filter(p -> Part.TEXT.equals(p.getType()))
                 .map(p -> ((TextPart) p).getText())
-//                .doOnNext(s -> log.info("client received: {}", s))
                 .filter(s -> s != null && !s.isBlank())
-                .doOnComplete(sink::complete)
-                .doOnError(sink::error)
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(str -> {
-                    ResponseFrame responseFrame = new ResponseFrame();
-                    responseFrame.setMessage(str);
-                    sink.next(responseFrame);
-                }));
+                .map(ResponseFrame::of);
 
     }
 }

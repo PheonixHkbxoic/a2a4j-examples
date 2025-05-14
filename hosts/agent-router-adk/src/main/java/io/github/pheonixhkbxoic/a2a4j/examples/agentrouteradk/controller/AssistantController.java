@@ -20,7 +20,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author PheonixHkbxoic
@@ -35,39 +34,39 @@ public class AssistantController {
 
     @ResponseBody
     @GetMapping("/chat")
-    public ResponseEntity<Map<String, Object>> chat(@RequestParam("userId") String userId,
-                                                    @RequestParam("sessionId") String sessionId,
-                                                    @RequestParam("prompts") String prompts) {
+    public ResponseEntity<String> chat(@RequestParam("userId") String userId,
+                                       @RequestParam("sessionId") String sessionId,
+                                       @RequestParam("prompts") String prompts) {
         AdkPayload payload = AdkPayload.builder()
                 .userId(userId)
                 .sessionId(sessionId)
                 .taskId(Uuid.uuid4hex())
                 .messages(List.of(AdkTextMessage.of(prompts)))
                 .build();
-        Mono<Map<String, Object>> result = this.assistant.chat(payload);
-        Map<String, Object> data;
+        Mono<String> result = this.assistant.chat(payload);
         try {
-            data = result.block();
+            String data = result.block();
+            return ResponseEntity.ok(data);
         } catch (A2AClientHTTPError e) {
             log.error("chat status: {}, error: {}", e.getStatusCode(), e.getMessage(), e);
-            return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         } catch (Exception e) {
             log.error("chat error: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
-        return ResponseEntity.ok(data);
     }
 
     @ResponseBody
     @GetMapping(value = "/completed", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Map<String, Object>> completed(@RequestParam("userId") String userId,
-                                               @RequestParam("sessionId") String sessionId,
-                                               @RequestParam("prompts") String prompts) {
+    public Flux<String> completed(@RequestParam("userId") String userId,
+                                  @RequestParam("sessionId") String sessionId,
+                                  @RequestParam("prompts") String prompts) {
         AdkPayload payload = AdkPayload.builder()
                 .userId(userId)
                 .sessionId(sessionId)
                 .taskId(Uuid.uuid4hex())
                 .messages(List.of(AdkTextMessage.of(prompts)))
+                .stream(true)
                 .build();
         return this.assistant.chatStream(payload);
     }
