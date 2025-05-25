@@ -37,7 +37,7 @@ public class EchoConfig {
         agentCard.setName("echoAgent");
         agentCard.setDescription("echo agent, Answer the user's questions exactly as they are");
         agentCard.setUrl("http://127.0.0.1:" + port);
-        agentCard.setVersion("2.0.1");
+        agentCard.setVersion("2.0.2");
         agentCard.setCapabilities(capabilities);
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;

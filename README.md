@@ -58,13 +58,13 @@ Features:
         <dependency>
             <groupId>io.github.pheonixhkbxoic</groupId>
             <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <!-- 或 use webflux -->
         <!--    <dependency>-->
         <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
         <!--        <artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>-->
-        <!--        <version>2.0.1</version>-->
+        <!--        <version>2.0.2</version>-->
         <!--    </dependency>-->
     </dependencies>
     ```
@@ -89,7 +89,7 @@ Features:
         agentCard.setName("echoAgent");
         agentCard.setDescription("echo agent, Answer the user's questions exactly as they are");
         agentCard.setUrl("http://127.0.0.1:" + port);
-        agentCard.setVersion("2.0.1");
+        agentCard.setVersion("2.0.2");
         agentCard.setCapabilities(capabilities);
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;
@@ -153,7 +153,7 @@ Features:
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-host-spring-boot-starter</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
     ```
 
@@ -239,13 +239,13 @@ Features:
         <dependency>
             <groupId>io.github.pheonixhkbxoic</groupId>
             <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <!-- 或 use webflux -->
         <!--    <dependency>-->
         <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
         <!--        <artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>-->
-        <!--        <version>2.0.1</version>-->
+        <!--        <version>2.0.2</version>-->
         <!--    </dependency>-->
     </dependencies>
     ```
@@ -310,7 +310,7 @@ Features:
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-core</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
     ```
 
@@ -377,7 +377,7 @@ store tasks
 <dependency>
     <groupId>io.github.pheonixhkbxoic</groupId>
     <artifactId>a2a4j-storage-redis-spring-boot-starter</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 </dependency>
 ```
 
