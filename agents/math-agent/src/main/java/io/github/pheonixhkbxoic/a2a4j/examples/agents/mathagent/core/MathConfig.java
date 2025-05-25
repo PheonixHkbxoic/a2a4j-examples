@@ -37,7 +37,7 @@ public class MathConfig {
         agentCard.setName("mathAgent");
         agentCard.setDescription("math genius, math expert, good at resolving all math questions");
         agentCard.setUrl("http://127.0.0.1:" + port);
-        agentCard.setVersion("2.0.1");
+        agentCard.setVersion("2.0.2");
         agentCard.setCapabilities(capabilities);
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;

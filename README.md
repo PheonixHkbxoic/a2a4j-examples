@@ -1,5 +1,3 @@
-[TOC]
-
 # a2a4j-examples
 
 [a2a4j](https://github.com/PheonixHkbxoic/a2a4j) example project
@@ -48,6 +46,7 @@ Features:
   to [a2a4j-examples jdk8](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/jdk8)
   and [a2a4j-examples main](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/main)
 - [x] support more LLM, eg.LangChain4j
+- [x] support redis as task storage
 
 ### agent/server配置
 
@@ -59,13 +58,13 @@ Features:
         <dependency>
             <groupId>io.github.pheonixhkbxoic</groupId>
             <artifactId>a2a4j-agent-mvc-spring-boot-starter</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <!-- 或 use webflux -->
         <!--    <dependency>-->
         <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
         <!--        <artifactId>a2a4j-agent-webflux-spring-boot-starter</artifactId>-->
-        <!--        <version>2.0.1</version>-->
+        <!--        <version>2.0.2</version>-->
         <!--    </dependency>-->
     </dependencies>
     ```
@@ -90,7 +89,7 @@ Features:
         agentCard.setName("echoAgent");
         agentCard.setDescription("echo agent, Answer the user's questions exactly as they are");
         agentCard.setUrl("http://127.0.0.1:" + port);
-        agentCard.setVersion("2.0.1");
+        agentCard.setVersion("2.0.2");
         agentCard.setCapabilities(capabilities);
         agentCard.setSkills(Collections.singletonList(skill));
         return agentCard;
@@ -154,7 +153,7 @@ Features:
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-host-spring-boot-starter</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
     ```
 
@@ -207,7 +206,7 @@ Features:
                             Task task = sendTaskResponse.getResult();
                             return Mono.just(task.getArtifacts().stream()
                                     .flatMap(t -> t.getParts().stream())
-                                    .filter(p -> new TextPart().getType().equals(p.getType()))
+                                    .filter(p -> Part.TEXT.equals(p.getType()))
                                     .map(p -> ((TextPart) p).getText())
                                     .filter(t -> !Util.isEmpty(t))
                                     .collect(Collectors.joining("\n")));
@@ -240,13 +239,13 @@ Features:
         <dependency>
             <groupId>io.github.pheonixhkbxoic</groupId>
             <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <!-- 或 use webflux -->
         <!--    <dependency>-->
         <!--        <groupId>io.github.pheonixhkbxoic</groupId>-->
         <!--        <artifactId>a2a4j-notification-webflux-spring-boot-starter</artifactId>-->
-        <!--        <version>2.0.1</version>-->
+        <!--        <version>2.0.2</version>-->
         <!--    </dependency>-->
     </dependencies>
     ```
@@ -311,7 +310,7 @@ Features:
     <dependency>
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-core</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
     ```
 
@@ -341,7 +340,7 @@ Features:
                         Task task = sendTaskResponse.getResult();
                         return Mono.just(task.getArtifacts().stream()
                                 .flatMap(t -> t.getParts().stream())
-                                .filter(p -> new TextPart().getType().equals(p.getType()))
+                                .filter(p -> Part.TEXT.equals(p.getType()))
                                 .map(p -> ((TextPart) p).getText())
                                 .filter(t -> !Util.isEmpty(t))
                                 .collect(Collectors.joining("\n")));
@@ -365,6 +364,22 @@ Features:
 * [agent-router-adk](https://github.com/PheonixHkbxoic/a2a4j-examples/tree/jdk17/hosts/agent-router-adk)  
   one router agent, multi other agent with [adk-java](https://github.com/PheonixHkbxoic/adk-java)  
   ![Agent Router](https://img.plantuml.biz/plantuml/png/ZP7D3e8m3CVlItY79bnq2Iy01F4Ll1eFOrGWpWt7Y0VZkxiDyMDguWxBslxwRzUMWs7QZ4SH4V-AI6_lpdHA0gNh1gNPgD6WfXGk4G58jh76UfSKpeWRZIXJoBaIIgSsKEHLuOMo3tWuTuQtYm0-iKb_1Ki70N0s88GKybRvPcOgq7RdUpEFpEn7uhtUaPasg90-dTaRksT2L8mVNj7PvqcKzVJRFoTc-N1ULxSGrKUaj46_dni0)
+
+### TaskStore
+
+AgentInvoker used by DefaultTaskManager in agent, in factor TaskManager storages `Task` and `PushNotificationInfo` by
+TaskStore  
+InMemoryTaskStore is default, you can use `a2a4j-storage-redis-spring-boot-starter` dependency if you want use redis to
+store tasks
+
+```xml
+
+<dependency>
+    <groupId>io.github.pheonixhkbxoic</groupId>
+    <artifactId>a2a4j-storage-redis-spring-boot-starter</artifactId>
+    <version>2.0.2</version>
+</dependency>
+```
 
 ## Star History
 

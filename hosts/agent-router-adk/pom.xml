@@ -5,27 +5,40 @@
         <groupId>io.github.pheonixhkbxoic</groupId>
         <artifactId>a2a4j-examples</artifactId>
         <version>2.0.2</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>notification-listener</artifactId>
+    <artifactId>agent-router-adk</artifactId>
     <packaging>jar</packaging>
 
-    <name>${project.parent.artifactId}:${project.artifactId}</name>
-    <description>a2a4j examples: ${project.artifactId}</description>
+    <name>${project.parent.artifactId}:hosts:${project.artifactId}</name>
+    <description>a2a4j host example: ${project.artifactId}</description>
     <url>https://github.com/PheonixHkbxoic/a2a4j-examples</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>io.github.pheonixhkbxoic</groupId>
-            <artifactId>a2a4j-notification-mvc-spring-boot-starter</artifactId>
+            <artifactId>a2a4j-host-spring-boot-starter</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pheonixhkbxoic</groupId>
+            <artifactId>adk-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
