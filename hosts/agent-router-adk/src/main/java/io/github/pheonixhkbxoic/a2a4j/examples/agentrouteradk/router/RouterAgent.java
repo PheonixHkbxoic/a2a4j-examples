@@ -2,7 +2,7 @@ package io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.router;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.input.PromptTemplate;
 import io.github.pheonixhkbxoic.a2a4j.core.client.A2AClientSet;
@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 public class RouterAgent implements AdkAgentInvoker {
     public static final String ACTIVE_AGENT = "activeAgent";
     private final A2AClientSet clientSet;
-    private final ChatLanguageModel model;
+    private final ChatModel model;
 
-    public RouterAgent(A2AClientSet clientSet, ChatLanguageModel model) {
+    public RouterAgent(A2AClientSet clientSet, ChatModel model) {
         this.clientSet = clientSet;
         this.model = model;
     }

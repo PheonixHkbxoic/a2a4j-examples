@@ -1,7 +1,7 @@
 package io.github.pheonixhkbxoic.a2a4j.examples.agentrouteradk.config;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ import static java.time.Duration.ofSeconds;
 public class LangChainConfig {
 
     @Bean
-    ChatLanguageModel chatLanguageModel() {
+    ChatModel chatModel() {
         return OpenAiChatModel.builder()
                 .apiKey(System.getenv("DEEPSEEK_API_KEY"))
                 .modelName("deepseek-chat")
@@ -30,7 +30,7 @@ public class LangChainConfig {
     }
 
     @Bean
-    StreamingChatLanguageModel streamingChatLanguageModel() {
+    StreamingChatModel streamingChatModel() {
         return OpenAiStreamingChatModel.builder()
                 .apiKey(System.getenv("DEEPSEEK_API_KEY"))
                 .modelName("deepseek-chat")

@@ -7,14 +7,14 @@ import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
-import dev.langchain4j.model.Tokenizer;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.TokenCountEstimator;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.bgesmallenv15q.BgeSmallEnV15QuantizedEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import dev.langchain4j.model.openai.OpenAiTokenizer;
+import dev.langchain4j.model.openai.OpenAiTokenCountEstimator;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
@@ -42,7 +42,7 @@ import static java.time.Duration.ofSeconds;
 public class LangChainConfig {
 
     @Bean
-    ChatLanguageModel chatLanguageModel() {
+    ChatModel chatModel() {
         return OpenAiChatModel.builder()
                 .apiKey(System.getenv("DEEPSEEK_API_KEY"))
                 .modelName("deepseek-chat")
@@ -54,7 +54,7 @@ public class LangChainConfig {
     }
 
     @Bean
-    StreamingChatLanguageModel streamingChatLanguageModel() {
+    StreamingChatModel streamingChatModel() {
         return OpenAiStreamingChatModel.builder()
                 .apiKey(System.getenv("DEEPSEEK_API_KEY"))
                 .modelName("deepseek-chat")
@@ -66,15 +66,15 @@ public class LangChainConfig {
     }
 
     @Bean
-    Tokenizer tokenizer() {
-        return new OpenAiTokenizer(GPT_4_O_MINI);
+    TokenCountEstimator tokenCountEstimator() {
+        return new OpenAiTokenCountEstimator(GPT_4_O_MINI);
     }
 
     @Bean
-    ChatMemoryProvider chatMemoryProvider(Tokenizer tokenizer) {
+    ChatMemoryProvider chatMemoryProvider(TokenCountEstimator tokenCountEstimator) {
         return memoryId -> TokenWindowChatMemory.builder()
                 .id(memoryId)
-                .maxTokens(5000, tokenizer)
+                .maxTokens(5000, tokenCountEstimator)
                 .build();
     }
 
@@ -117,8 +117,8 @@ public class LangChainConfig {
     Assistant assistant(ChatMemoryProvider chatMemoryProvider, ContentRetriever contentRetriever) {
         return AiServices.builder(Assistant.class)
                 .chatMemoryProvider(chatMemoryProvider)
-                .chatLanguageModel(chatLanguageModel())
-                .streamingChatLanguageModel(streamingChatLanguageModel())
+                .chatModel(chatModel())
+                .streamingChatModel(streamingChatModel())
                 .contentRetriever(contentRetriever)
                 .systemMessageProvider(nop -> """
                         Your name is Roger, you are a customer support agent of a car rental company named 'Miles of Smiles'.

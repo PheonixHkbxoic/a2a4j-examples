@@ -2,8 +2,8 @@ package io.github.pheonixhkbxoic.a2a4j.examples.hosts.multiagent.router;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.request.ResponseFormat;
 import dev.langchain4j.model.chat.request.ResponseFormatType;
@@ -42,11 +42,11 @@ public class AgentRouter {
     private final A2AClientSet clientSet;
     private final A2a4jAgentsProperties a2a4jAgentsProperties;
 
-    private final ChatLanguageModel model;
-    private final StreamingChatLanguageModel streamingModel;
+    private final ChatModel model;
+    private final StreamingChatModel streamingModel;
 
     public AgentRouter(A2AClientSet a2aClientSet, A2a4jAgentsProperties a2a4jAgentsProperties,
-                       ChatLanguageModel model, StreamingChatLanguageModel streamingModel) {
+                       ChatModel model, StreamingChatModel streamingModel) {
         this.clientSet = a2aClientSet;
         this.a2a4jAgentsProperties = a2a4jAgentsProperties;
         this.model = model;

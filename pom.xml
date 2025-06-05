@@ -24,7 +24,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springboot.version>3.4.5</springboot.version>
         <a2a4j.version>2.0.2</a2a4j.version>
-        <langchain4j.version>1.0.0-beta3</langchain4j.version>
+        <langchain4j.version>1.0.1</langchain4j.version>
+        <langchain4j.beta6.version>1.0.1-beta6</langchain4j.beta6.version>
     </properties>
 
     <dependencyManagement>
@@ -78,22 +79,27 @@
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
-                <version>${langchain4j.version}</version>
+                <version>${langchain4j.beta6.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-spring-boot-starter</artifactId>
-                <version>${langchain4j.version}</version>
+                <version>${langchain4j.beta6.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-easy-rag</artifactId>
-                <version>${langchain4j.version}</version>
+                <version>${langchain4j.beta6.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-milvus</artifactId>
+                <version>${langchain4j.beta6.version}</version>
             </dependency>
             <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j-reactor</artifactId>
-                <version>${langchain4j.version}</version>
+                <version>${langchain4j.beta6.version}</version>
             </dependency>
 
             <dependency>

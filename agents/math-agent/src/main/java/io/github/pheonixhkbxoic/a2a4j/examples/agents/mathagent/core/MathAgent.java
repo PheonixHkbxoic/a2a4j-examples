@@ -4,8 +4,8 @@ import dev.langchain4j.agent.tool.ToolSpecifications;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
@@ -33,16 +33,17 @@ import java.util.stream.Collectors;
  * @date 2025/4/14 15:34
  * @desc math agent: use LangChain4j low level  api
  */
+@SuppressWarnings("unchecked")
 @Component
 @Slf4j
 public class MathAgent implements AgentInvoker {
-    private ChatLanguageModel model;
-    private StreamingChatLanguageModel streamingModel;
+    private final ChatModel model;
+    private final StreamingChatModel streamingModel;
     private final Calculator calculator = new Calculator();
 
     private final SystemMessage systemMessage = new SystemMessage("You are a math genius, good at resolving all math questions");
 
-    public MathAgent(ChatLanguageModel model, StreamingChatLanguageModel streamingModel) {
+    public MathAgent(ChatModel model, StreamingChatModel streamingModel) {
         this.model = model;
         this.streamingModel = streamingModel;
     }
@@ -50,13 +51,13 @@ public class MathAgent implements AgentInvoker {
     // manually handle tool execution
     private final Map<String, Function<String, String>> toolHandlerMappings = Map.of(
             "squareRoot", args -> {
-                Map params = Util.fromJson(args, HashMap.class);
+                Map<String, Object> params = Util.fromJson(args, HashMap.class);
                 double x = Double.parseDouble(String.valueOf(params.get("x")));
                 int precision = Integer.parseInt(String.valueOf(params.getOrDefault("precision", 8)));
                 return calculator.squareRoot(x, precision);
             },
             "add", args -> {
-                Map params = Util.fromJson(args, HashMap.class);
+                Map<String, Object> params = Util.fromJson(args, HashMap.class);
                 int a = Integer.parseInt(String.valueOf(params.get("a")));
                 int b = Integer.parseInt(String.valueOf(params.getOrDefault("b", 8)));
                 return String.valueOf(calculator.add(a, b));
